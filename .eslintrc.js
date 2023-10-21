@@ -1,17 +1,13 @@
 // .eslintrc.js
 module.exports = {
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: "babel-eslint"
   },
-  extends: [
-    'plugin:vue/recommended'
-  ],
-  plugins: [
-    'vuetify'
-  ],
+  extends: ["plugin:vue/recommended"],
+  plugins: ["vuetify"],
   rules: {
-    'vuetify/no-deprecated-classes': 'error',
-    'vuetify/no-legacy-grid': 'error',
-    'indent': ["error", 2]
-  },
-}
+    "vuetify/no-deprecated-classes": "error",
+    "vuetify/no-legacy-grid": "error"
+    // 'indent': ["error", 2]
+  }
+};

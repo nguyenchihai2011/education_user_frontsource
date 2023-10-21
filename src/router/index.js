@@ -1,153 +1,94 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from "vue";
+import VueRouter from "vue-router";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    component: () => import(
-      /* webpackChunkName: "layouts-default-index" */
-      '@/layouts/default/Index'
-    ),
+    path: "/",
+    component: () => import("@/layouts/default/Index"),
     children: [
       {
-        path: '/',
-        name: 'Dashboard',
-        component: () => import(
-          /* webpackChunkName: "views-dashboard" */
-          '@/views/Dashboard'
-        )
+        path: "/",
+        name: "Home",
+        component: () => import("@/views/Dashboard")
       },
       {
-        path: '/grid-system',
-        name: 'GridSystem',
-        component: () => import(
-          /* webpackChunkName: "views-grid-system" */
-          '@/views/GridSystem'
-        )
+        path: "/category",
+        name: "Category",
+        component: () => import("@/views/Category")
       },
       {
-        path: '/grid-list-page',
-        name: 'GridListPage',
-        component: () => import(
-          /* webpackChunkName: "views-grid-list-page" */
-          '@/views/GridListPage'
-        )
+        path: "/course",
+        name: "Course",
+        component: () => import("@/views/Course")
       },
       {
-        path: '/breakpoints',
-        name: 'Breakpoints',
-        component: () => import(
-          /* webpackChunkName: "views-breakpoints" */
-          '@/views/Breakpoints'
-        )
+        path: "/lecture",
+        name: "Lecture",
+        component: () => import("@/views/Lecture")
       },
       {
-        path: '/typography',
-        name: 'Typography',
-        component: () => import(
-          /* webpackChunkName: "views-typography" */
-          '@/views/Typography'
-        )
+        path: "/checkout",
+        name: "Checkout",
+        component: () => import("@/views/Checkout")
       },
       {
-        path: '/tables/app-table',
-        name: 'AppTables',
-        component: () => import(
-          /* webpackChunkName: "views-app-tables" */
-          '@/views/table/AppTables'
-        )
+        path: "/user",
+        component: () => import("@/views/user/ViewMain"),
+        children: [
+          {
+            path: "my-learning",
+            name: "MyLearning",
+            component: () => import("@/views/user/MyLearning")
+          },
+          {
+            path: "my-cart",
+            name: "MyCart",
+            component: () => import("@/views/user/MyLearning")
+          },
+          {
+            path: "profile",
+            name: "Profile",
+            component: () => import("@/views/user/Profile")
+          }
+        ]
       },
       {
-        path: '/tables/basic-table',
-        name: 'BasicTables',
-        component: () => import(
-          /* webpackChunkName: "views-basic-tables" */
-          '@/views/table/BasicTables'
-        )
-      },
-      {
-        path: '/forms/validation-form',
-        name: 'ValidationForm',
-        component: () => import(
-          /* webpackChunkName: "views-validation-forms" */
-          '@/views/form/ValidationForms'
-        )
-      },
-      {
-        path: '/forms/app-form',
-        name: 'AppForm',
-        component: () => import(
-          /* webpackChunkName: "views-app-forms" */
-          '@/views/form/AppForms'
-        )
-      },
-      {
-        path: '/buttons',
-        name: 'Buttons',
-        component: () => import(
-          /* webpackChunkName: "views-buttons" */
-          '@/views/Buttons'
-        )
-      },
-      {
-        path: '/icons',
-        name: 'Icons',
-        component: () => import(
-          /* webpackChunkName: "views-icons" */
-          '@/views/Icons'
-        )
-      },
-    ]
-  },
-  {
-    path: '/authentication',
-    component: () => import(
-      /* webpackChunkName: "layouts-authentication-index" */
-      '@/layouts/authentication/Index'
-    ),
-    children: [
-      {
-        path: 'sign-in',
-        name: 'SignIn',
-        component: () => import(
-          /* webpackChunkName: "views-sign-in" */
-          '@/views/authentication/SignIn'
-        )
-      },
-      {
-        path: 'sign-up',
-        name: 'SignUp',
-        component: () => import(
-          /* webpackChunkName: "views-sign-up" */
-          '@/views/authentication/SignUp'
-        )
-      },
-    ]
-  },
-  {
-    path: '/page',
-    component: () => import(
-      /* webpackChunkName: "layouts-page-index" */
-      '@/layouts/page/Index'
-    ),
-    children: [
-      {
-        path: 'product-list',
-        name: 'ProductList',
-        component: () => import(
-          /* webpackChunkName: "views-product-list" */
-          '@/views/page/ProductList'
-        )
-      },
+        path: "/authentication",
+        component: () => import("@/views/authentication/ViewMain"),
+        children: [
+          {
+            path: "sign-in",
+            name: "SignIn",
+            component: () => import("@/views/authentication/SignIn")
+          },
+          {
+            path: "sign-up",
+            name: "SignUp",
+            component: () => import("@/views/authentication/SignUp")
+          }
+        ]
+      }
     ]
   }
-]
+];
 const router = new VueRouter({
-  mode: process.env.NODE_ENV === 'production' ? 'hash' : 'history',
+  mode: process.env.NODE_ENV === "production" ? "hash" : "history",
   base: process.env.BASE_URL,
   routes
-})
+});
 
-export default router
+// router.beforeEach((to, from, next) => {
+//   if (!checkUserLoggedIn() && to.name !== "SignIn") {
+//     next({ name: "SignIn" });
+//   } else {
+//     next();
+//   }
+// });
+
+// function checkUserLoggedIn() {
+//   return !!localStorage.getItem("token");
+// }
+
+export default router;

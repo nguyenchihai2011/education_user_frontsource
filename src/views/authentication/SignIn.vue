@@ -1,103 +1,68 @@
 <template>
-  <v-container class="fill-height">
-    <v-row justify="center">
-      <v-col cols="auto">
-        <v-card
-          width="460"
+  <v-container>
+    <v-row class="justify-center">
+      <v-col cols="5">
+        <div class="text-h6 font-weight-bold d-flex justify-center">
+          Log in to your Open Education account
+        </div>
+        <v-text-field
+          v-model="username"
+          outlined
+          placeholder="Username"
+          color="#000"
+          height="38"
+          hide-details
+          class="mt-4"
+        ></v-text-field>
+        <v-text-field
+          v-model="password"
+          outlined
+          placeholder="Password"
+          color="#000"
+          height="38"
+          hide-details
+          class="mt-4"
+        ></v-text-field>
+        <v-btn
+          class="purple lighten-2 white--text text-none mt-4"
+          height="48"
+          width="100%"
+          @click="signIn()"
         >
-          <v-card-text class="text-center px-12 py-16">
-            <validation-observer
-              ref="observer"
-              v-slot="{ invalid }"
-            >
-              <v-form
-                ref="form"
-                @submit.prevent="signIn"
-              >
-                <div class="text-h4 font-weight-black mb-10">
-                  로그인
-                </div>
-                <validation-provider
-                  v-slot="{ errors }"
-                  name="이메일"
-                  :rules="{
-                    required: true,
-                  }"
-                >
-                  <v-text-field
-                    v-model="email"
-                    label="이메일"
-                    clearable
-                    prepend-icon="mdi-email"
-                    :error-messages="errors"
-                  />
-                </validation-provider>
-                <validation-provider
-                  v-slot="{ errors }"
-                  name="비밀번호"
-                  :rules="{
-                    required: true,
-                  }"
-                >
-                  <v-text-field
-                    v-model="password"
-                    label="비밀번호"
-                    clearable
-                    prepend-icon="mdi-lock-outline"
-                    :error-messages="errors"
-                  />
-                </validation-provider>
-                <v-btn
-                  class="mt-6"
-                  type="submit"
-                  block
-                  x-large
-                  rounded
-                  color="primary"
-                  :disabled="invalid"
-                >
-                  로그인
-                </v-btn>
-                <div class="mt-5">
-                  <router-link
-                    class="text-decoration-none"
-                    to="/"
-                  >
-                    홈
-                  </router-link> |
-                  <router-link
-                    class="text-decoration-none"
-                    to="/authentication/sign-up"
-                  >
-                    회원가입
-                  </router-link>
-                </div>
-              </v-form>
-            </validation-observer>
-          </v-card-text>
-        </v-card>
+          Log in
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
 <script>
+import { signIn, getUserInfo } from "@/api/auth";
+
 export default {
-  name: 'SignIn',
-  data: () => ({
-    email: null,
-    password: null,
-  }),
+  components: {},
+  data() {
+    return {
+      username: "",
+      password: ""
+    };
+  },
   methods: {
-    signIn () {
-      this.$refs.observer.validate().then(result => {
-        if (result) {
-          alert('로그직 로직')
-        }
-      })
+    signIn() {
+      const payload = {
+        username: this.username,
+        password: this.password
+      };
+      signIn(payload)
+        .then(res => {
+          localStorage.setItem("token", res.data.token);
+          getUserInfo(res.data.token).then(res => {
+            console.log(res);
+          });
+          this.$router.push("/");
+        })
+        .catch(err => console.log(err));
     }
   }
-}
+};
 </script>
-<style lang="">
-
-</style>

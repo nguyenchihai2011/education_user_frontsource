@@ -1,25 +1,21 @@
 <template>
   <v-app>
-    <default-bar />
-
-    <default-drawer />
-
+    <core-header></core-header>
     <default-view />
+    <core-footer></core-footer>
   </v-app>
 </template>
 <script>
-import DefaultBar from './AppBar'
-import DefaultDrawer from './Drawer'
-import DefaultView from './View'
+import CoreHeader from "@/components/core/CoreHeader.vue";
+import CoreFooter from "@/components/core/CoreFooter.vue";
+import DefaultView from "@/layouts/default/View.vue";
 export default {
-  name: 'DefaultLayout',
+  name: "DefaultLayout",
   components: {
-    DefaultBar,
-    DefaultDrawer,
-    DefaultView
-  },
-}
+    DefaultView,
+    CoreHeader,
+    CoreFooter
+  }
+};
 </script>
-<style lang="">
-
-</style>
+<style lang=""></style>

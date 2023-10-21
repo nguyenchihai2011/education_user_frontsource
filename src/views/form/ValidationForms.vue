@@ -5,14 +5,8 @@
         Form Validation
       </v-card-title>
       <v-card-text>
-        <validation-observer
-          ref="observer"
-          v-slot="{ invalid }"
-        >
-          <v-form
-            ref="form"
-            @submit.prevent="submit"
-          >
+        <validation-observer ref="observer" v-slot="{ invalid }">
+          <v-form ref="form" @submit.prevent="submit">
             <validation-provider
               v-slot="{ errors }"
               name="Name"
@@ -35,7 +29,7 @@
               :rules="{
                 required: true,
                 numeric: true,
-                digits: 11,
+                digits: 11
               }"
             >
               <v-text-field
@@ -111,38 +105,36 @@
 export default {
   data: () => ({
     customValue: null,
-    name: '',
-    phoneNumber: '',
-    email: '',
+    name: "",
+    phoneNumber: "",
+    email: "",
     select: null,
     items: [
-      { text: '아이템1', value: 1 },
-      { text: '아이템2', value: 2 },
-      { text: '아이템3', value: 3 },
+      { text: "아이템1", value: 1 },
+      { text: "아이템2", value: 2 },
+      { text: "아이템3", value: 3 }
     ],
-    checkbox: null,
+    checkbox: null
   }),
   methods: {
-    submit () {
+    submit() {
       this.$refs.observer.validate().then(result => {
         if (result) {
-          alert('성공')
+          alert("성공");
         } else {
-          alert('실패')
+          alert("실패");
         }
-      })
+      });
     },
-    clear () {
-      this.name = ''
-      this.phoneNumber = ''
-      this.email = ''
-      this.select = null
-      this.checkbox = null
-      this.$refs.observer.reset()
-    },
-  },
-}
+    clear() {
+      this.name = "";
+      this.phoneNumber = "";
+      this.email = "";
+      this.select = null;
+      this.checkbox = null;
+      this.$refs.observer.reset();
+    }
+  }
+};
 </script>
-<style lang="">
-
-</style>
+<style lang=""></style>
