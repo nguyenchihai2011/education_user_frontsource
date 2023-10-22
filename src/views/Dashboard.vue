@@ -1,192 +1,166 @@
 <template>
   <v-container fluid>
     <v-row>
+      <v-col cols="12" class="pa-0">
+        <v-carousel hide-delimiters>
+          <v-carousel-item
+            v-for="(item, i) in items"
+            :key="i"
+            :src="item.src"
+          ></v-carousel-item>
+        </v-carousel>
+      </v-col>
+      <v-col cols="12" class="pb-0">
+        <div class="text-h5">Top Best Sellers</div>
+      </v-col>
+      <v-col cols="12" class="d-flex">
+        <v-row>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col cols="12" class="pb-0">
+        <div class="text-h5">Super Deals</div>
+      </v-col>
+      <v-col cols="12" class="d-flex">
+        <v-row>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col cols="12" class="pb-0">
+        <div class="text-h5">Recommended for you</div>
+      </v-col>
+      <v-col cols="12" class="d-flex">
+        <v-row>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+          <v-col cols="2">
+            <course-intro />
+          </v-col>
+        </v-row>
+      </v-col>
       <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            <v-icon
-              :color="checking ? 'red lighten-2' : 'indigo'"
-              class="mr-12"
-              size="64"
-              @click="takePulse"
-            >
-              mdi-heart-pulse
-            </v-icon>
-            <v-row align="start">
-              <div class="text-caption grey--text text-uppercase">
-                Heart rate
-              </div>
-              <div>
-                <span class="text-h3 font-weight-black" v-text="avg || '—'" />
-                <strong v-if="avg">BPM</strong>
-              </div>
-            </v-row>
-
-            <v-spacer />
-
-            <v-btn icon class="align-self-start" size="28">
-              <v-icon>mdi-arrow-right-thick</v-icon>
-            </v-btn>
-          </v-card-title>
-
-          <v-sheet color="transparent">
-            <v-sparkline
-              :key="String(avg)"
-              :smooth="16"
-              :gradient="['#f72047', '#ffd200', '#1feaea']"
-              :line-width="3"
-              :value="heartbeats"
-              auto-draw
-              stroke-linecap="round"
-            />
-          </v-sheet>
-        </v-card>
+        <v-row class="justify-center">
+          <v-col cols="3" class="d-flex flex-column justify-center">
+            <div class="text-h4 font-weight-bold mb-4">
+              Upskill your team with Open Education
+            </div>
+            <ul class="text-h6 font-weight-regular">
+              <li>
+                Unlimited access to 22,000+ top Open Education courses, anytime,
+                anywhere
+              </li>
+              <li>
+                International course collection in 14 languages
+              </li>
+              <li>
+                Top certifications in tech and business
+              </li>
+            </ul>
+          </v-col>
+          <v-col cols="3">
+            <v-img src="@/assets/dashboard_intro_education.jpg"></v-img>
+          </v-col>
+        </v-row>
       </v-col>
-      <v-col
-        v-for="(item, index) in items1"
-        :key="`sheet-${index}`"
-        cols="12"
-        sm="6"
-        md="3"
-        lg="3"
-      >
-        <v-card class="mt-4 mx-auto">
-          <v-sheet
-            class="v-sheet--offset mx-auto"
-            :color="item.color"
-            elevation="12"
-            max-width="calc(100% - 32px)"
-          >
-            <v-sparkline
-              :labels="item.labels"
-              :value="item.value"
-              color="white"
-              line-width="2"
-              padding="16"
-            />
-          </v-sheet>
-
-          <v-card-text class="pt-0">
-            <div class="text-h6 my-2">
-              {{ item.title }}
+      <v-col cols="12">
+        <v-row class="justify-center">
+          <v-col cols="3">
+            <v-img src="@/assets/dashboard_become_lecture.jpg"></v-img>
+          </v-col>
+          <v-col cols="3" class="d-flex flex-column justify-center">
+            <div class="text-h4 font-weight-bold mb-4">
+              Become an instructor
             </div>
-            <div class="subheading font-weight-light grey--text">
-              Last Campaign Performance
+            <div class="text-h6 font-weight-regular mb-4">
+              Instructors from around the world teach millions of learners on
+              Open Education. We provide the tools and skills to teach what you
+              love.
             </div>
-            <v-divider class="my-2" />
-            <v-icon class="mr-2" small>
-              mdi-clock
-            </v-icon>
-            <span class="text-caption grey--text font-weight-light"
-              >last registration 26 minutes ago</span
+            <core-button
+              class="black white--text py-6"
+              link
+              to="/authentication/sign-up/lecture"
+              >Start teaching today</core-button
             >
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col
-        v-for="(color, index) in ['dark', 'cyan', 'success']"
-        :key="index"
-        cols="12"
-        sm="4"
-      >
-        <v-card class="mx-auto text-center" :color="color" dark>
-          <v-card-text>
-            <v-sheet color="rgba(0, 0, 0, .12)">
-              <v-sparkline
-                :value="item"
-                color="rgba(255, 255, 255, .7)"
-                height="100"
-                padding="24"
-                stroke-linecap="round"
-                smooth
-              >
-                <template v-slot:label="item"> ${{ item.value }} </template>
-              </v-sparkline>
-            </v-sheet>
-          </v-card-text>
-
-          <v-card-text>
-            <div class="text-h4 font-weight-thin">
-              Sales Last 24h
-            </div>
-          </v-card-text>
-
-          <v-divider />
-
-          <v-card-actions class="justify-center">
-            <v-btn block text>
-              Go to Report
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>
 </template>
 <script>
-const exhale = ms => new Promise(resolve => setTimeout(resolve, ms));
+import CourseIntro from "@/components/course/CourseIntro.vue";
+import CoreButton from "@/components/core/CoreButton.vue";
 export default {
-  name: "Dashboard",
+  components: { CourseIntro, CoreButton },
   data: () => ({
-    checking: false,
-    heartbeats: [],
-    item: [423, 446, 675, 510, 590, 610, 760],
-    items1: [
+    items: [
       {
-        color: "blue",
-        title: "총 판매량",
-        labels: ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"],
-        value: [200, 675, 410, 390, 310, 460, 250, 240]
+        src: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg"
       },
       {
-        color: "red",
-        title: "하루 판매량",
-        labels: ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"],
-        value: [200, 675, 410, 390, 310, 460, 250, 240]
+        src: "https://cdn.vuetifyjs.com/images/carousel/sky.jpg"
       },
       {
-        color: "green",
-        title: "일 회원 가입 수",
-        labels: ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"],
-        value: [200, 675, 410, 390, 310, 460, 250, 240]
+        src: "https://cdn.vuetifyjs.com/images/carousel/bird.jpg"
       },
       {
-        color: "primary",
-        title: "월별 매출",
-        labels: ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"],
-        value: [200, 675, 410, 390, 310, 460, 250, 240]
+        src: "https://cdn.vuetifyjs.com/images/carousel/planet.jpg"
       }
     ]
   }),
-  computed: {
-    avg() {
-      const sum = this.heartbeats.reduce((acc, cur) => acc + cur, 0);
-      const length = this.heartbeats.length;
+  computed: {},
 
-      if (!sum && !length) return 0;
+  created() {},
 
-      return Math.ceil(sum / length);
-    }
-  },
-
-  created() {
-    this.takePulse(false);
-  },
-
-  methods: {
-    heartbeat() {
-      return Math.ceil(Math.random() * (120 - 80) + 80);
-    },
-    async takePulse(inhale = true) {
-      this.checking = true;
-
-      inhale && (await exhale(1000));
-
-      this.heartbeats = Array.from({ length: 20 }, this.heartbeat);
-
-      this.checking = false;
-    }
-  }
+  methods: {}
 };
 </script>
 <style lang=""></style>

@@ -3,7 +3,7 @@
     <v-row class="justify-center">
       <v-col cols="5">
         <div class="text-h6 font-weight-bold d-flex justify-center">
-          Sign up and start learning
+          Sign up and start {{ isSignUpStudent ? "learning" : "teaching" }}
         </div>
         <v-text-field
           v-model="username"
@@ -51,7 +51,14 @@
 </template>
 
 <script>
-// import { signUp, signUpStudent } from "@/api/auth";
+import { mapGetters, mapActions } from "vuex";
+import {
+  signUp,
+  signUpStudent,
+  signUpLecture,
+  signIn,
+  getUserInfo
+} from "@/api/auth";
 
 export default {
   components: {},
@@ -63,7 +70,47 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters("auth", ["userId", "role"]),
+    isSignUpStudent() {
+      return this.$route.name === "SignUp";
+    }
+  },
+
   methods: {
+    ...mapActions("auth", ["setUserId", "setRole", "setToken"]),
+    createInitProfile() {
+      const payload = {
+        userId: this.userId
+      };
+
+      if (this.isSignUpStudent) {
+        signUpStudent(payload).then(() => {});
+      } else {
+        signUpLecture(payload).then(() => {});
+      }
+    },
+
+    signIn() {
+      const payload = {
+        username: this.username,
+        password: this.password
+      };
+      signIn(payload)
+        .then(res => {
+          this.setToken(res.data.token);
+          this.setUserId(res.data.userId);
+          this.setRole(res.data.role);
+
+          getUserInfo({ userId: this.userId, role: this.role }).then(res => {
+            console.log(res.data);
+            // this.setAuth(res.data);
+            this.$router.push("/");
+          });
+        })
+        .catch(err => console.log(err));
+    },
+
     signUp() {
       const payload = {
         username: this.username,
@@ -71,20 +118,14 @@ export default {
         password: this.password
       };
       const params = {
-        role: "Student"
+        role: this.isSignUpStudent ? "Student" : "Lecture"
       };
       signUp(params, payload)
         .then(res => {
-          localStorage.setItem("userId", res.data);
-          signUpStudent({
-            address: "185, Tân Sơn, Phường 15, Tân Bình, Hồ Chí Minh",
-            avatarUrl: "",
-            firstName: "Student",
-            lastName: "1",
-            userId: res.data
-          }).then(res => {
-            console.log(res);
-          });
+          this.setUserId(res.data.id);
+          this.setRole(res.data.userType);
+          this.createInitProfile();
+          this.signIn();
         })
         .catch(err => console.log(err));
     }

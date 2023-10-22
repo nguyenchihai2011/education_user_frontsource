@@ -38,6 +38,7 @@
 
 <script>
 import { signIn, getUserInfo } from "@/api/auth";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   components: {},
@@ -47,7 +48,11 @@ export default {
       password: ""
     };
   },
+  computed: {
+    ...mapGetters("auth", ["token", "userId", "role"])
+  },
   methods: {
+    ...mapActions("auth", ["setToken", "setUserId", "setRole", "setAuth"]),
     signIn() {
       const payload = {
         username: this.username,
@@ -55,11 +60,15 @@ export default {
       };
       signIn(payload)
         .then(res => {
-          localStorage.setItem("token", res.data.token);
-          getUserInfo(res.data.token).then(res => {
-            console.log(res);
+          this.setToken(res.data.token);
+          this.setUserId(res.data.userId);
+          this.setRole(res.data.role);
+
+          getUserInfo({ userId: this.userId, role: this.role }).then(res => {
+            console.log(res.data);
+            // this.setAuth(res.data);
+            this.$router.push("/");
           });
-          this.$router.push("/");
         })
         .catch(err => console.log(err));
     }

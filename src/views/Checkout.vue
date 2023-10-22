@@ -85,6 +85,7 @@
               >
                 Complete Checkout
               </v-btn>
+              <div id="paypal-button-container"></div>
             </v-card>
           </v-col>
         </v-row>
@@ -98,6 +99,34 @@ export default {
     return {
       radioGroup: 1
     };
+  },
+
+  mounted() {
+    paypal
+      .Buttons({
+        createOrder: function(data, actions) {
+          // Tạo đơn hàng khi người dùng bấm nút thanh toán
+          return actions.order.create({
+            purchase_units: [
+              {
+                amount: {
+                  value: "10.00" // Giá trị cần thanh toán
+                }
+              }
+            ]
+          });
+        },
+        onApprove: function(data, actions) {
+          // Xác nhận đơn hàng sau khi thanh toán thành công
+          return actions.order.capture().then(function(details) {
+            // Thực hiện các hành động cần thiết sau khi thanh toán thành công
+            console.log(
+              "Transaction completed by " + details.payer.name.given_name
+            );
+          });
+        }
+      })
+      .render("#paypal-button-container");
   }
 };
 </script>

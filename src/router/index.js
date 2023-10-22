@@ -43,6 +43,11 @@ const routes = [
             component: () => import("@/views/user/MyLearning")
           },
           {
+            path: "my-teaching",
+            name: "MyLearning",
+            component: () => import("@/views/lecture/MyTeaching")
+          },
+          {
             path: "my-cart",
             name: "MyCart",
             component: () => import("@/views/user/MyLearning")
@@ -66,6 +71,11 @@ const routes = [
           {
             path: "sign-up",
             name: "SignUp",
+            component: () => import("@/views/authentication/SignUp")
+          },
+          {
+            path: "sign-up/lecture",
+            name: "SignUpLecture",
             component: () => import("@/views/authentication/SignUp")
           }
         ]

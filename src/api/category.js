@@ -1,6 +1,6 @@
 import { apiClient } from "./apiClient";
 
-const getListCategory = (params, signal) => {
+const getListCategory = (params, signal = undefined) => {
   return apiClient.get("category", {
     params,
     signal

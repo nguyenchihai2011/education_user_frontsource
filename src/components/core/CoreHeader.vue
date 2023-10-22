@@ -63,9 +63,6 @@
           </v-list>
         </v-menu>
       </v-col>
-      <!-- <v-col cols="1" class="d-flex justify-center align-center"> -->
-
-      <!-- </v-col> -->
       <v-col cols="5" class="d-flex align-center">
         <v-text-field
           outlined
@@ -79,7 +76,7 @@
       </v-col>
       <v-divider></v-divider>
       <v-col cols="2" class="d-flex justify-end align-center">
-        <div class="d-flex align-center">
+        <div v-if="isLogged" class="d-flex align-center">
           <v-btn text><v-icon>mdi-cart</v-icon></v-btn>
           <v-menu
             open-on-hover
@@ -111,13 +108,22 @@
                 </v-list-item>
               </v-hover>
               <v-divider class="mx-4 my-2 mt-4"></v-divider>
-              <v-hover v-slot:default="{ hover }">
+              <v-hover v-if="isStudent" v-slot:default="{ hover }">
                 <v-list-item
                   :class="[hover ? 'primary--text' : '']"
                   link
                   to="/user/my-learning"
                 >
                   <div>My learning</div>
+                </v-list-item>
+              </v-hover>
+              <v-hover v-else v-slot:default="{ hover }">
+                <v-list-item
+                  :class="[hover ? 'primary--text' : '']"
+                  link
+                  to="/user/my-teaching"
+                >
+                  <div>My teaching</div>
                 </v-list-item>
               </v-hover>
               <v-hover v-slot:default="{ hover }">
@@ -136,14 +142,17 @@
               </v-hover>
               <v-divider class="mx-4 my-2"></v-divider>
               <v-hover v-slot:default="{ hover }">
-                <v-list-item :class="[hover ? 'primary--text' : '']">
+                <v-list-item
+                  :class="[hover ? 'primary--text' : '']"
+                  @click="signOut()"
+                >
                   <div>Log out</div>
                 </v-list-item>
               </v-hover>
             </v-list>
           </v-menu>
         </div>
-        <div class="d-flex align-center">
+        <div v-else class="d-flex align-center">
           <core-button outlined link class="ml-2" to="/authentication/sign-in">
             Sign in
           </core-button>
@@ -157,6 +166,8 @@
 </template>
 
 <script>
+import { logout } from "@/api/auth";
+import { mapGetters, mapActions } from "vuex";
 import { getListCategory } from "@/api/category";
 import CoreButton from "@/components/core/CoreButton.vue";
 export default {
@@ -168,13 +179,33 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters("auth", ["token", "role"]),
+    isLogged() {
+      return !!this.token;
+    },
+    isStudent() {
+      return this.role === "Student";
+    }
+  },
+
   methods: {
+    ...mapActions("auth", ["unsetAuth"]),
     fetchCategories(params = {}) {
       this.abortController.abort();
-      // Tạo mới AbortController
       this.abortController = new AbortController();
       getListCategory(params, this.abortController.signal).then(res => {
         this.categories = res.data;
+      });
+    },
+
+    signOut() {
+      logout().then(() => {
+        localStorage.clear();
+        this.unsetAuth();
+        if (this.$route.name !== "Home") {
+          this.$router.push("/");
+        }
       });
     }
   },
