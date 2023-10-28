@@ -14,19 +14,19 @@ const routes = [
         component: () => import("@/views/Dashboard")
       },
       {
-        path: "/category",
+        path: "/category/:id",
         name: "Category",
         component: () => import("@/views/Category")
       },
       {
-        path: "/course",
+        path: "/course/:id",
         name: "Course",
         component: () => import("@/views/Course")
       },
       {
-        path: "/lecture",
-        name: "Lecture",
-        component: () => import("@/views/Lecture")
+        path: "/course/:courseId/lesson/:id",
+        name: "Lesson",
+        component: () => import("@/views/Lesson")
       },
       {
         path: "/checkout",
@@ -44,7 +44,7 @@ const routes = [
           },
           {
             path: "my-teaching",
-            name: "MyLearning",
+            name: "MyTeaching",
             component: () => import("@/views/lecture/MyTeaching")
           },
           {

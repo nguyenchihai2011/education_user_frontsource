@@ -14,6 +14,21 @@ export default {
     localStorage.setItem("role", role);
   },
 
+  setAvatarUrl(state, avatarUrl) {
+    state.avatarUrl = avatarUrl;
+    localStorage.setItem("avatarUrl", avatarUrl);
+  },
+
+  setLectureId(state, lectureId) {
+    state.lectureId = lectureId;
+    localStorage.setItem("lectureId", lectureId);
+  },
+
+  setStudentId(state, studentId) {
+    state.studentId = studentId;
+    localStorage.setItem("studentId", studentId);
+  },
+
   setAuth(state, auth) {
     state.userId = auth.userId;
     localStorage.setItem("token", auth.userId);

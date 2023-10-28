@@ -9,13 +9,25 @@
             Create new course
           </core-button>
         </v-col>
-        <v-col cols="12">
+        <v-col v-if="courses.length === 0" cols="12">
           <div class="text-h6 font-weight-regular">
             No courses have been created yet
           </div>
         </v-col>
-        <v-col cols="12">
-          <!-- <course-details></course-details> -->
+        <v-col v-else cols="12">
+          <v-row no-gutters v-for="course in courses" :key="course.id">
+            <v-col cols="12">
+              <course-details
+                :courseId="course.id"
+                :courseImage="course.imageUrl"
+                :courseName="course.name"
+                :courseTitle="course.title"
+                :coursePrice="course.price"
+                :lectureName="lectureFullName(course.lecture)"
+                :showPrice="false"
+              ></course-details>
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
     </v-container>
@@ -28,24 +40,40 @@
 </template>
 
 <script>
-// import CourseDetails from "@/components/course/CourseDetails.vue";
+import CourseDetails from "@/components/course/CourseDetails.vue";
+import { getCourse } from "@/api/course";
 import CoreButton from "@/components/core/CoreButton.vue";
 import CourseDialog from "@/components/course/CourseDialog.vue";
 export default {
-  //   components: { CourseDetails }
-  components: { CoreButton, CourseDialog },
+  components: { CoreButton, CourseDialog, CourseDetails },
   data() {
     return {
-      isCourseDialog: false
+      isCourseDialog: false,
+      courses: []
     };
   },
+
   methods: {
+    fetchCourseYourself() {
+      getCourse().then(res => {
+        this.courses = res.data;
+      });
+    },
+
     openCourseDialog() {
       this.isCourseDialog = true;
     },
     closeCourseDialog() {
       this.isCourseDialog = false;
+    },
+
+    lectureFullName(lecture) {
+      return `${lecture?.firstName} ${lecture?.lastName}`;
     }
+  },
+
+  created() {
+    this.fetchCourseYourself();
   }
 };
 </script>

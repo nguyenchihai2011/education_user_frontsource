@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" max-width="374">
+  <v-card class="mx-auto" max-width="370">
     <template slot="progress">
       <v-progress-linear
         color="deep-purple"
@@ -8,10 +8,13 @@
       ></v-progress-linear>
     </template>
 
-    <v-img src="https://cdn.vuetifyjs.com/images/cards/cooking.png"></v-img>
+    <v-img
+      @click="$router.push(`/course/${courseId}`)"
+      :src="courseImage"
+    ></v-img>
 
-    <v-card-title>Cafe Badilico</v-card-title>
-    <v-card-subtitle class="pb-2">$ • Italian, Cafe</v-card-subtitle>
+    <v-card-title>{{ courseName }}</v-card-title>
+    <v-card-subtitle class="pb-2">{{ courseTitle }}</v-card-subtitle>
 
     <v-card-text class="pb-2">
       <div class="d-flex">
@@ -26,8 +29,10 @@
         <div class="grey--text ml-1">4.5 (413)</div>
       </div>
     </v-card-text>
-    <v-card-text class="py-0 font-weight-bold"><u>đ</u>2,449,000</v-card-text>
-    <v-card-actions>
+    <v-card-text class="py-0 font-weight-bold"
+      >{{ coursePrice }} USD</v-card-text
+    >
+    <!-- <v-card-actions>
       <v-btn
         color="deep-purple lighten-2"
         text
@@ -37,10 +42,31 @@
         <v-icon>mdi-cart-plus</v-icon>
         <div>Add to cart</div>
       </v-btn>
-    </v-card-actions>
+    </v-card-actions> -->
   </v-card>
 </template>
 
 <script>
-export default {};
+export default {
+  props: {
+    courseId: {
+      type: Number
+    },
+    courseImage: {
+      type: String
+    },
+
+    courseName: {
+      type: String
+    },
+
+    courseTitle: {
+      type: String
+    },
+
+    coursePrice: {
+      type: Number
+    }
+  }
+};
 </script>

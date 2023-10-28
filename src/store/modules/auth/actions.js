@@ -11,6 +11,18 @@ export default {
     commit("setRole", role);
   },
 
+  setAvatarUrl({ commit }, avatarUrl) {
+    commit("setAvatarUrl", avatarUrl);
+  },
+
+  setStudentId({ commit }, studentId) {
+    commit("setStudentId", studentId);
+  },
+
+  setLectureId({ commit }, lectureId) {
+    commit("setLectureId", lectureId);
+  },
+
   setAuth({ commit }, auth) {
     commit("setAuth", auth);
   },

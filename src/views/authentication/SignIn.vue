@@ -16,6 +16,7 @@
         ></v-text-field>
         <v-text-field
           v-model="password"
+          type="password"
           outlined
           placeholder="Password"
           color="#000"
@@ -41,18 +42,27 @@ import { signIn, getUserInfo } from "@/api/auth";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  components: {},
   data() {
     return {
       username: "",
-      password: ""
+      password: "",
+      isHasProfileLecture: false
     };
   },
   computed: {
     ...mapGetters("auth", ["token", "userId", "role"])
   },
   methods: {
-    ...mapActions("auth", ["setToken", "setUserId", "setRole", "setAuth"]),
+    ...mapActions("auth", [
+      "setToken",
+      "setUserId",
+      "setRole",
+      "setAvatarUrl",
+      "setLectureId",
+      "setStudentId",
+      "setAuth"
+    ]),
+
     signIn() {
       const payload = {
         username: this.username,
@@ -65,9 +75,18 @@ export default {
           this.setRole(res.data.role);
 
           getUserInfo({ userId: this.userId, role: this.role }).then(res => {
-            console.log(res.data);
-            // this.setAuth(res.data);
-            this.$router.push("/");
+            this.setAvatarUrl(res.data.avatarUrl);
+            if (this.role === "Lecture") {
+              this.setLectureId(res.data.id);
+              if (res.data.id) {
+                this.$router.push("/");
+              } else {
+                this.$router.push("/user/profile");
+              }
+            } else {
+              this.setStudentId(res.data.id);
+              this.$router.push("/");
+            }
           });
         })
         .catch(err => console.log(err));

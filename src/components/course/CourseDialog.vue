@@ -1,5 +1,11 @@
 <template>
-  <core-dialog v-model="model" :width="650" persistent :title="title">
+  <core-dialog
+    v-model="model"
+    :width="650"
+    :height="700"
+    persistent
+    :title="title"
+  >
     <template v-slot:title>
       <div style="width: 100%;">{{ title }}</div>
       <v-divider class="my-1" color="#ccc"></v-divider>
@@ -205,7 +211,6 @@
       </div>
     </template>
     <template v-slot:actions>
-      <!-- <v-divider class="my-1" color="#ccc"></v-divider> -->
       <div class="d-flex justify-center">
         <core-button
           @click.native="closeDialog()"
@@ -229,6 +234,7 @@
 
 <script>
 import axios from "axios";
+import { mapGetters } from "vuex";
 import CoreDialog from "@/components/core/CoreDialog.vue";
 import CoreButton from "@/components/core/CoreButton.vue";
 import { getListCategory } from "@/api/category";
@@ -247,7 +253,7 @@ export default {
         title: "",
         imageUrl: "",
         description: "",
-        price: undefined,
+        price: 0,
         level: "",
         language: "",
         categoryId: ""
@@ -256,6 +262,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters("auth", ["lectureId"]),
     model: {
       get() {
         return this.value;
@@ -299,14 +306,17 @@ export default {
 
     createCourse() {
       const payload = {
-        ...this.course
-        // createBy: ,
-        // createAt: ,
-        // updateBy: ,
-        // updateAt: ,
-        // lectureId: ,
+        ...this.course,
+        price: Number(this.course.price),
+        createBy: String(this.lectureId),
+        createAt: new Date().toISOString(),
+        updateBy: String(this.lectureId),
+        updateAt: new Date().toISOString(),
+        lectureId: this.lectureId
       };
-      addCourse().then(res => {});
+      addCourse(payload).then(res => {
+        console.log(res.data);
+      });
     },
 
     async submit() {
@@ -326,7 +336,7 @@ export default {
           }
         );
         this.course.imageUrl = response.data.secure_url;
-        this.changeProfile();
+        this.createCourse();
       } catch (error) {
         console.error("Error uploading file:", error);
       }

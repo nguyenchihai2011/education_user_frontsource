@@ -2,7 +2,7 @@
   <v-app>
     <core-header></core-header>
     <default-view />
-    <core-footer></core-footer>
+    <core-footer v-if="$route.name !== 'Lesson'"></core-footer>
   </v-app>
 </template>
 <script>

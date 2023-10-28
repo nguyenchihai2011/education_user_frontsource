@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <div class="text-h4">JavaScript Courses</div>
+        <div class="text-h4">{{ category.name }} Courses</div>
       </v-col>
 
       <v-col cols="12" class="d-flex py-0">
@@ -15,55 +15,37 @@
       </v-col>
       <v-col cols="12" class="d-flex">
         <v-row>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
+          <v-col cols="3" v-for="course in category.courses" :key="course.id">
+            <course-intro
+              :courseId="course.id"
+              :courseImage="course.imageUrl"
+              :courseName="course.name"
+              :courseTitle="course.title"
+              :coursePrice="course.price"
+            />
           </v-col>
         </v-row>
       </v-col>
 
       <v-col cols="12" class="pb-0">
-        <div class="text-h5">Top courses in JavaScript</div>
+        <div class="text-h5">Top courses in {{ category.name }}</div>
       </v-col>
       <v-col cols="12" class="d-flex">
         <v-row>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
+          <v-col cols="3" v-for="course in category.courses" :key="course.id">
+            <course-intro
+              :courseId="course.id"
+              :courseImage="course.imageUrl"
+              :courseName="course.name"
+              :courseTitle="course.title"
+              :coursePrice="course.price"
+            />
           </v-col>
         </v-row>
       </v-col>
 
       <v-col cols="12" class="pb-0">
-        <div class="text-h5">All JavaScript courses</div>
+        <div class="text-h5">All {{ category.name }} courses</div>
       </v-col>
       <v-col cols="12">
         <v-row>
@@ -136,11 +118,19 @@
             </div>
           </v-col>
           <v-col cols="9">
-            <course-details />
-            <course-details />
-            <course-details />
-            <course-details />
-            <course-details />
+            <div v-for="course in category.courses" :key="course.id">
+              <course-details
+                :courseId="course.id"
+                :courseImage="course.imageUrl"
+                :courseName="course.name"
+                :courseTitle="course.title"
+                :coursePrice="course.price"
+                :lectureName="
+                  `${course.lecture.firstName} ${course.lecture.lastName}`
+                "
+              >
+              </course-details>
+            </div>
           </v-col>
           <v-col cols="12">
             <v-pagination
@@ -157,10 +147,12 @@
 <script>
 import CourseIntro from "@/components/course/CourseIntro.vue";
 import CourseDetails from "@/components/course/CourseDetails.vue";
+import { getCategory } from "@/api/category";
 export default {
   components: { CourseIntro, CourseDetails },
   data() {
     return {
+      category: {},
       radioGroup: 0,
       radioItems: [
         { label: "4.5", value: 1 },
@@ -171,6 +163,24 @@ export default {
       checkbox: false,
       page: 1
     };
+  },
+
+  watch: {
+    "$route.params.id"() {
+      this.getCategoryInfo();
+    }
+  },
+
+  methods: {
+    getCategoryInfo() {
+      getCategory(this.$route.params.id).then(res => {
+        this.category = res.data;
+      });
+    }
+  },
+
+  created() {
+    this.getCategoryInfo();
   }
 };
 </script>

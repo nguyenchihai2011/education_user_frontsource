@@ -10,80 +10,59 @@
           ></v-carousel-item>
         </v-carousel>
       </v-col>
-      <v-col cols="12" class="pb-0">
+      <v-col cols="12" class="pb-0" v-if="!isLecture">
         <div class="text-h5">Top Best Sellers</div>
       </v-col>
-      <v-col cols="12" class="d-flex">
+      <v-col cols="12" class="d-flex" v-if="!isLecture">
         <v-row>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
+          <v-col cols="2" v-for="course in category.courses" :key="course.id">
+            <course-intro
+              :courseId="course.id"
+              :courseImage="course.imageUrl"
+              :courseName="course.name"
+              :courseTitle="course.title"
+              :coursePrice="course.price"
+            />
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="12" class="pb-0">
+      <v-col cols="12" class="pb-0" v-if="!isLecture">
         <div class="text-h5">Super Deals</div>
       </v-col>
-      <v-col cols="12" class="d-flex">
+      <v-col cols="12" class="d-flex" v-if="!isLecture">
         <v-row>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
+          <v-col cols="2" v-for="course in category.courses" :key="course.id">
+            <course-intro
+              :courseId="course.id"
+              :courseImage="course.imageUrl"
+              :courseName="course.name"
+              :courseTitle="course.title"
+              :coursePrice="course.price"
+            />
           </v-col>
         </v-row>
       </v-col>
-      <v-col cols="12" class="pb-0">
+      <v-col cols="12" class="pb-0" v-if="!isLecture">
         <div class="text-h5">Recommended for you</div>
       </v-col>
-      <v-col cols="12" class="d-flex">
+      <v-col cols="12" class="d-flex" v-if="!isLecture">
         <v-row>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
-          </v-col>
-          <v-col cols="2">
-            <course-intro />
+          <v-col cols="2" v-for="course in category.courses" :key="course.id">
+            <course-intro
+              :courseId="course.id"
+              :courseImage="course.imageUrl"
+              :courseName="course.name"
+              :courseTitle="course.title"
+              :coursePrice="course.price"
+            />
           </v-col>
         </v-row>
+      </v-col>
+      <v-col v-if="isLecture">
+        <v-img src="@/assets/dashboard_lecture_1.webp"></v-img>
+      </v-col>
+      <v-col v-if="isLecture">
+        <v-img src="@/assets/dashboard_lecture_2.webp"></v-img>
       </v-col>
       <v-col cols="12">
         <v-row class="justify-center">
@@ -136,11 +115,14 @@
   </v-container>
 </template>
 <script>
+import { mapGetters } from "vuex";
 import CourseIntro from "@/components/course/CourseIntro.vue";
 import CoreButton from "@/components/core/CoreButton.vue";
+import { getCategory } from "@/api/category";
 export default {
   components: { CourseIntro, CoreButton },
   data: () => ({
+    category: {},
     items: [
       {
         src: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg"
@@ -156,11 +138,27 @@ export default {
       }
     ]
   }),
-  computed: {},
+  computed: {
+    ...mapGetters("auth", ["role"]),
+    isStudent() {
+      return this.role === "Student";
+    },
+    isLecture() {
+      return this.role === "Lecture";
+    }
+  },
 
-  created() {},
+  methods: {
+    getCategoryInfo() {
+      getCategory(1).then(res => {
+        this.category = res.data;
+      });
+    }
+  },
 
-  methods: {}
+  created() {
+    this.getCategoryInfo();
+  }
 };
 </script>
 <style lang=""></style>

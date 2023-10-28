@@ -2,17 +2,15 @@
   <v-container>
     <v-row>
       <v-col cols="3">
-        <v-img
-          alt="Education Logo"
-          class="mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-        />
+        <router-link :to="`/course/${courseId}`" class="d-block">
+          <v-img width="200px" cover :src="courseImage"></v-img>
+          <!-- <v-img class="mr-2 d-block" contain :src="courseImage" /> -->
+        </router-link>
       </v-col>
       <v-col cols="6">
-        <div class="font-weight-bold">Javascript Practicals Crash Course</div>
-        <div class="text-subtitle-1">Learn javascript Concepts</div>
-        <div class="text-caption">PROPER DOT INSTITUTE</div>
+        <div class="font-weight-bold">{{ courseName }}</div>
+        <div class="text-subtitle-1">{{ courseTitle }}</div>
+        <div class="text-caption">{{ lectureName }}</div>
         <div class="d-flex mx-0">
           <v-rating
             :value="4.2"
@@ -24,24 +22,60 @@
           ></v-rating>
           <div class="grey--text ml-1">4.2 (413)</div>
         </div>
-        <div class="text-caption">
+        <!-- <div class="text-caption">
           38 total mins <v-icon>mdi-circle-small</v-icon>7
           letures<v-icon>mdi-circle-small</v-icon>All Levels
-        </div>
+        </div> -->
       </v-col>
-      <v-col cols="3">
-        <div class="py-0 px-4 font-weight-bold"><u>đ</u>2,449,000</div>
-        <v-btn
-          class="d-flex justify-start mt-2 deep-purple lighten-2 white--text text-none"
+      <v-col cols="3" v-if="showPrice">
+        <div class="py-0 px-4 font-weight-bold">{{ coursePrice }} USD</div>
+        <core-button
+          class="mt-2 py-5 deep-purple lighten-2 white--text text-none"
         >
           <v-icon>mdi-cart-plus</v-icon>
           <div class="ml-2">Add to cart</div>
-        </v-btn>
+        </core-button>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-export default {};
+import CoreButton from "@/components/core/CoreButton.vue";
+export default {
+  components: {
+    CoreButton
+  },
+
+  methods: {
+    navigateToCourse() {
+      console.log("dawhdjh");
+      this.$router.push("/course");
+    }
+  },
+  props: {
+    courseId: {
+      type: Number
+    },
+    courseImage: {
+      type: String
+    },
+    courseName: {
+      type: String
+    },
+    courseTitle: {
+      type: String
+    },
+    coursePrice: {
+      type: Number
+    },
+    lectureName: {
+      type: String
+    },
+    showPrice: {
+      type: Boolean,
+      default: true
+    }
+  }
+};
 </script>

@@ -9,11 +9,11 @@ const signUp = function(params, payload) {
 };
 
 const signUpStudent = function(payload) {
-  return apiClient.post("student", payload);
+  return apiClient.post("/student", payload);
 };
 
 const signUpLecture = function(payload) {
-  return apiClient.post("lecture", payload);
+  return apiClient.post("/lecture", payload);
 };
 
 const getUserInfo = function(params) {

@@ -1,17 +1,77 @@
 <template>
   <v-row no-gutters>
-    <v-col cols="12">
-      <div>My learning</div>
-    </v-col>
-    <v-col cols="12">
-      <course-details></course-details>
-    </v-col>
+    <v-container>
+      <v-row>
+        <v-col cols="12" class="d-flex align-center justify-space-between mt-6">
+          <div class="text-h4">My learning</div>
+        </v-col>
+        <v-col v-if="student.orders.length === 0" cols="12">
+          <div class="text-h6 font-weight-regular">
+            No courses have been created yet
+          </div>
+        </v-col>
+        <v-col v-else cols="12">
+          <v-row no-gutters v-for="order in student.orders" :key="order.id">
+            <v-col
+              cols="12"
+              v-for="orderDetail in order.orderDetails"
+              :key="orderDetail.id"
+            >
+              <course-details
+                :courseId="orderDetail.course.id"
+                :courseImage="orderDetail.course.imageUrl"
+                :courseName="orderDetail.course.name"
+                :courseTitle="orderDetail.course.title"
+                :coursePrice="orderDetail.course.price"
+                :lectureName="lectureFullName(orderDetail.course.lecture)"
+                :showPrice="false"
+              ></course-details>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-row>
 </template>
 
 <script>
 import CourseDetails from "@/components/course/CourseDetails.vue";
+import { getCourseYourselfStudent } from "@/api/student";
+import { mapGetters, mapActions } from "vuex";
 export default {
-  components: { CourseDetails }
+  components: { CourseDetails },
+  data() {
+    return {
+      student: {}
+    };
+  },
+
+  computed: {
+    ...mapGetters("auth", ["studentId"])
+  },
+
+  methods: {
+    ...mapActions("yourself", ["setCoursesOfStudent"]),
+    fetchCourseYourself() {
+      getCourseYourselfStudent(this.studentId).then(res => {
+        this.student = res.data;
+        let coursesOfStudent = [];
+        res.data.orders.forEach(element => {
+          element.orderDetails.forEach(item => {
+            coursesOfStudent.push(item);
+          });
+        });
+        this.setCoursesOfStudent(coursesOfStudent);
+      });
+    },
+
+    lectureFullName(lecture) {
+      return `${lecture?.firstName} ${lecture?.lastName}`;
+    }
+  },
+
+  created() {
+    this.fetchCourseYourself();
+  }
 };
 </script>

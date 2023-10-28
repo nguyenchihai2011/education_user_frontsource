@@ -26,6 +26,7 @@
         <v-text-field
           v-model="password"
           outlined
+          type="password"
           placeholder="Password"
           color="#000"
           height="38"
@@ -78,7 +79,14 @@ export default {
   },
 
   methods: {
-    ...mapActions("auth", ["setUserId", "setRole", "setToken"]),
+    ...mapActions("auth", [
+      "setUserId",
+      "setRole",
+      "setToken",
+      "setAvatarUrl",
+      "setLectureId",
+      "setStudentId"
+    ]),
     createInitProfile() {
       const payload = {
         userId: this.userId
@@ -103,9 +111,14 @@ export default {
           this.setRole(res.data.role);
 
           getUserInfo({ userId: this.userId, role: this.role }).then(res => {
-            console.log(res.data);
-            // this.setAuth(res.data);
-            this.$router.push("/");
+            this.setAvatarUrl(res.data.avatarUrl);
+            if (this.role === "Lecture") {
+              this.setLectureId(res.data.id);
+              this.$router.push("/user/profile");
+            } else {
+              this.setStudentId(res.data.id);
+              this.$router.push("/");
+            }
           });
         })
         .catch(err => console.log(err));
