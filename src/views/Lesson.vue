@@ -35,8 +35,11 @@
           <v-tab-item>
             <v-card flat class="ma-4">
               <div class="d-flex align-start mb-16">
-                <v-avatar color="primary" size="48" class="mr-4"></v-avatar>
+                <v-avatar color="teal" size="48" class="ma-4">
+                  <img :src="avatarUrl" alt="John" />
+                </v-avatar>
                 <v-textarea
+                  v-model="commentText"
                   outlined
                   placeholder="Enter the text comment"
                   color="#000"
@@ -44,35 +47,22 @@
                   height="80"
                   class="rounded-l lecture-comment"
                 ></v-textarea>
-                <v-btn text><v-icon>mdi-send</v-icon></v-btn>
+                <v-btn text @click="sendComment()"
+                  ><v-icon>mdi-send</v-icon></v-btn
+                >
               </div>
-              <div class="d-flex mb-6">
-                <v-avatar color="primary" size="48" class="mr-4"></v-avatar>
+              <div
+                class="d-flex mb-6"
+                v-for="comment in comments"
+                :key="comment.id"
+              >
+                <v-avatar size="48" class="mr-4">
+                  <img :src="comment.avatarUrl" alt="John" />
+                </v-avatar>
                 <div>
-                  <div class="font-weight-bold">Khang Trần</div>
+                  <div class="font-weight-bold">{{ comment.name }}</div>
                   <div>
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex mb-6">
-                <v-avatar color="primary" size="48" class="mr-4"></v-avatar>
-                <div>
-                  <div class="font-weight-bold">Khang Trần</div>
-                  <div>
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
-                    This is good course This is good course This is good course
+                    {{ comment.content }}
                   </div>
                 </div>
               </div>
@@ -88,8 +78,9 @@
           flat
         >
           <div class="d-flex justify-space-between align-center py-2">
-            <div class="ml-4 text-h6">Course Content</div>
-            <div>
+            <div class="ml-4 text-h5 font-ưeight-bold">Course Content</div>
+            <div class="d-flex justify-end align-center">
+              <progress-chart :data="dataProgress" :width="80" :height="80" />
               <v-btn @click="isNavigation = false" text>
                 <v-icon>mdi-close</v-icon>
               </v-btn>
@@ -108,21 +99,20 @@
                 v-for="lesson in item.lessons"
                 :key="lesson.id"
               >
-                <v-card
-                  flat
-                  @click="
-                    $router.push(`/course/${course.id}/lesson/${lesson.id}`)
-                  "
-                  class="d-flex align-start"
-                >
+                <v-card flat class="d-flex align-start">
                   <v-checkbox
                     v-model="lesson.studentLessons[0].isLock"
                     class="ma-0 mr-2"
+                    @click="updateProgress(lesson.id)"
                   ></v-checkbox>
-                  <div>
+                  <v-card-actions
+                    @click="
+                      $router.push(`/course/${course.id}/lesson/${lesson.id}`)
+                    "
+                  >
                     <div class="font-weight-bold">{{ lesson.name }}</div>
                     <v-icon class="mr-2" size="20">mdi-television-play</v-icon>
-                  </div>
+                  </v-card-actions>
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -136,10 +126,24 @@
 import CoreFooter from "@/components/core/CoreFooter.vue";
 import { getCourseById } from "@/api/course";
 import { getLessonById } from "@/api/lesson";
-import { getStudentLesson } from "@/api/studentLesson";
+import {
+  getStudentLesson,
+  updateProgress,
+  getProgress
+} from "@/api/studentLesson";
 import { mapGetters } from "vuex";
+import ProgressChart from "@/components/app/ProgressChart.vue";
+import { getCommentsCourse } from "@/api/comment";
+
+const connection = new signalR.HubConnectionBuilder()
+  .withUrl("https://localhost:7254/chatHub", {
+    skipNegotiation: true,
+    transport: signalR.HttpTransportType.WebSockets
+  })
+  .build();
+
 export default {
-  components: { CoreFooter },
+  components: { CoreFooter, ProgressChart },
 
   data() {
     return {
@@ -149,12 +153,15 @@ export default {
       tab: null,
       course: {},
       lesson: {},
-      studentLessons: []
+      studentLessons: [],
+      dataProgress: [],
+      comments: [],
+      commentText: ""
     };
   },
 
   computed: {
-    ...mapGetters("auth", ["studentId"])
+    ...mapGetters("auth", ["studentId", "userId", "avatarUrl"])
   },
 
   watch: {
@@ -172,8 +179,41 @@ export default {
         this.lesson = res.data;
         this.videoCard++;
       });
+    },
+
+    updateProgress(lessonId) {
+      const params = {
+        studentId: Number(this.studentId),
+        lessonId: lessonId,
+        courseId: this.course.id
+      };
+      updateProgress(params).then(res => {
+        this.dataProgress = res.data;
+      });
+    },
+    getCommentsCourse() {
+      console.log("getCommentsCourse");
+      const params = {
+        courseId: this.$route.params.courseId
+      };
+      getCommentsCourse(params).then(res => {
+        this.comments = res.data;
+      });
+    },
+
+    sendComment() {
+      const payload = {
+        content: this.commentText,
+        createAt: "2023-10-29T08:02:44.274Z",
+        updateAt: "2023-10-29T08:02:44.274Z",
+        userId: this.userId,
+        courseId: Number(this.$route.params.courseId)
+      };
+      console.log(payload);
+      connection.invoke("SendComment", payload);
     }
   },
+
   created() {
     getCourseById(this.$route.params.courseId).then(res => {
       this.course = res.data;
@@ -190,6 +230,30 @@ export default {
     getStudentLesson(params).then(res => {
       this.studentLessons = res.data;
     });
+    const progressParams = {
+      courseId: this.$route.params.courseId,
+      studentId: this.studentId
+    };
+    getProgress(progressParams).then(res => {
+      this.dataProgress = res.data;
+    });
+    this.getCommentsCourse();
+  },
+
+  mounted() {
+    var self = this;
+    connection
+      .start()
+      .then(function() {
+        console.log("SignalR Connected!");
+        connection.on("ReceiveComment", () => {
+          console.log("agfagd");
+          self.getCommentsCourse();
+        });
+      })
+      .catch(function(err) {
+        return console.error(err.toString());
+      });
   }
 };
 </script>

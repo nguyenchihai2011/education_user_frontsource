@@ -122,8 +122,18 @@
             <template v-slot:activator="{ on, attrs }">
               <v-hover>
                 <div v-bind="attrs" v-on="on">
-                  <v-avatar color="teal" size="48" class="ma-4">
+                  <v-avatar
+                    v-if="!avatarUrl"
+                    color="teal"
+                    size="48"
+                    class="ma-4"
+                  >
                     <img :src="avatarUrl" alt="John" />
+                  </v-avatar>
+                  <v-avatar v-else color="teal" size="48" class="ma-4">
+                    <v-icon dark>
+                      mdi-account-circle
+                    </v-icon>
                   </v-avatar>
                 </div>
               </v-hover>
