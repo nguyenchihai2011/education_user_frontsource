@@ -19,14 +19,16 @@
     <v-card-text class="pb-2">
       <div class="d-flex">
         <v-rating
-          :value="4.5"
+          :value="courseRatingAvg"
           color="amber"
           dense
           half-increments
           readonly
           size="12"
         ></v-rating>
-        <div class="grey--text ml-1">4.5 (413)</div>
+        <div class="grey--text ml-1">
+          {{ courseRatingAvg }} ({{ totalRatings }})
+        </div>
       </div>
     </v-card-text>
     <v-card-text class="py-0 font-weight-bold"
@@ -65,6 +67,14 @@ export default {
     },
 
     coursePrice: {
+      type: Number
+    },
+
+    courseRatingAvg: {
+      type: Number
+    },
+
+    totalRatings: {
       type: Number
     }
   }

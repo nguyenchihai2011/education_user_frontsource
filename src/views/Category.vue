@@ -15,13 +15,15 @@
       </v-col>
       <v-col cols="12" class="d-flex">
         <v-row>
-          <v-col cols="3" v-for="course in category.courses" :key="course.id">
+          <v-col cols="2" v-for="course in courseBeginners" :key="course.id">
             <course-intro
               :courseId="course.id"
               :courseImage="course.imageUrl"
               :courseName="course.name"
               :courseTitle="course.title"
               :coursePrice="course.price"
+              :courseRatingAvg="course.ratingAvg"
+              :totalRatings="course.totalRatings"
             />
           </v-col>
         </v-row>
@@ -32,26 +34,37 @@
       </v-col>
       <v-col cols="12" class="d-flex">
         <v-row>
-          <v-col cols="3" v-for="course in category.courses" :key="course.id">
+          <v-col cols="2" v-for="course in topCourses" :key="course.id">
             <course-intro
               :courseId="course.id"
               :courseImage="course.imageUrl"
               :courseName="course.name"
               :courseTitle="course.title"
               :coursePrice="course.price"
+              :courseRatingAvg="course.ratingAvg"
+              :totalRatings="course.totalRatings"
             />
           </v-col>
         </v-row>
       </v-col>
 
-      <v-col cols="12" class="pb-0">
+      <v-col cols="12" class="pb-0 d-flex justify-space-between align-center">
         <div class="text-h5">All {{ category.name }} courses</div>
+        <div>
+          <v-btn class="text-none" outlined @click="clearFilter()">
+            Clear filter</v-btn
+          >
+        </div>
       </v-col>
       <v-col cols="12">
         <v-row>
           <v-col cols="3">
             <div class="font-weight-bold">Ratings</div>
-            <v-radio-group v-model="radioGroup" hide-details>
+            <v-radio-group
+              v-model="radioGroup"
+              hide-details
+              @change="changeRating()"
+            >
               <v-radio
                 v-for="item in radioItems"
                 :key="item.value"
@@ -74,51 +87,46 @@
             </v-radio-group>
             <v-divider class="my-4"></v-divider>
             <div class="font-weight-bold">Level</div>
-            <div>
-              <v-checkbox
-                v-model="checkbox"
-                label="All levels"
-                hide-details
-                class="mt-2"
-              ></v-checkbox>
-              <v-checkbox
-                v-model="checkbox"
-                label="Beginner"
-                hide-details
-                class="mt-2"
-              ></v-checkbox>
-              <v-checkbox
-                v-model="checkbox"
-                label="Intermediate"
-                hide-details
-                class="mt-2"
-              ></v-checkbox>
-              <v-checkbox
-                v-model="checkbox"
-                label="Expert"
-                hide-details
-                class="mt-2"
-              ></v-checkbox>
-            </div>
+            <v-radio-group
+              v-model="radioGroupLevel"
+              hide-details
+              @change="changeLevel()"
+            >
+              <v-radio
+                v-for="item in radioItemsLevel"
+                :key="item.value"
+                :value="item.value"
+              >
+                <template v-slot:label>
+                  <div class="d-flex mx-0">
+                    <div class="grey--text ml-1">{{ item.label }}</div>
+                  </div>
+                </template>
+              </v-radio>
+            </v-radio-group>
             <v-divider class="my-4"></v-divider>
             <div class="font-weight-bold">Price</div>
-            <div>
-              <v-checkbox
-                v-model="checkbox"
-                label="Paid"
-                hide-details
-                class="mt-2"
-              ></v-checkbox>
-              <v-checkbox
-                v-model="checkbox"
-                label="Free"
-                hide-details
-                class="mt-2"
-              ></v-checkbox>
-            </div>
+            <v-radio-group
+              v-model="radioGroupPrice"
+              hide-details
+              @change="changePrice()"
+            >
+              <v-radio
+                v-for="item in radioItemsPrice"
+                :key="item.value"
+                :value="item.value"
+              >
+                <template v-slot:label>
+                  <div class="d-flex mx-0">
+                    <div class="grey--text ml-1">{{ item.label }}</div>
+                  </div>
+                </template>
+              </v-radio>
+            </v-radio-group>
+            <v-divider class="my-4"></v-divider>
           </v-col>
           <v-col cols="9">
-            <div v-for="course in category.courses" :key="course.id">
+            <div v-for="course in course.result" :key="course.id">
               <course-details
                 :courseId="course.id"
                 :courseImage="course.imageUrl"
@@ -128,6 +136,8 @@
                 :lectureName="
                   `${course.lecture.firstName} ${course.lecture.lastName}`
                 "
+                :courseRatingAvg="course.ratingAvg"
+                :totalRatings="course.totalRatings"
               >
               </course-details>
             </div>
@@ -135,8 +145,8 @@
           <v-col cols="12">
             <v-pagination
               v-model="page"
-              :length="15"
-              :total-visible="7"
+              :length="course.totalPage"
+              :total-visible="10"
             ></v-pagination>
           </v-col>
         </v-row>
@@ -148,26 +158,45 @@
 import CourseIntro from "@/components/course/CourseIntro.vue";
 import CourseDetails from "@/components/course/CourseDetails.vue";
 import { getCategory } from "@/api/category";
+import { getCourse } from "@/api/course";
 export default {
   components: { CourseIntro, CourseDetails },
   data() {
     return {
       category: {},
-      radioGroup: 0,
+      radioGroup: -1,
       radioItems: [
-        { label: "4.5", value: 1 },
-        { label: "4.0", value: 2 },
-        { label: "3.5", value: 3 },
-        { label: "3.0", value: 4 }
+        { label: 4.5, value: 0 },
+        { label: 4.0, value: 1 },
+        { label: 3.5, value: 2 },
+        { label: 3.0, value: 3 }
+      ],
+      radioGroupLevel: -1,
+      radioItemsLevel: [
+        { label: "Beginner", value: 0 },
+        { label: "Intermediate", value: 1 },
+        { label: "Expert", value: 2 }
+      ],
+      radioGroupPrice: -1,
+      radioItemsPrice: [
+        { label: "Paid", value: 0 },
+        { label: "Free", value: 1 }
       ],
       checkbox: false,
-      page: 1
+      page: 1,
+      course: {},
+      courseBeginners: [],
+      topCourses: []
     };
   },
 
   watch: {
     "$route.params.id"() {
       this.getCategoryInfo();
+    },
+
+    page() {
+      this.getCourses();
     }
   },
 
@@ -176,11 +205,75 @@ export default {
       getCategory(this.$route.params.id).then(res => {
         this.category = res.data;
       });
+    },
+
+    getCourses() {
+      const params = {
+        categoryId: this.$route.params.id,
+        rating:
+          this.radioGroup !== -1
+            ? this.radioItems[this.radioGroup].label
+            : undefined,
+        level:
+          this.radioGroupLevel !== -1
+            ? this.radioItemsLevel[this.radioGroupLevel].label
+            : undefined,
+        page: this.page,
+        size: 10,
+        from: this.radioGroupPrice === 0 ? 0.1 : undefined,
+        to: this.radioGroupPrice === 1 ? 0 : undefined
+      };
+      getCourse(params).then(res => {
+        this.course = res.data;
+      });
+    },
+
+    changeRating() {
+      this.page = 1;
+      this.getCourses();
+    },
+
+    changeLevel() {
+      this.page = 1;
+      this.getCourses();
+    },
+
+    changePrice() {
+      this.page = 1;
+      this.getCourses();
+    },
+
+    clearFilter() {
+      this.radioGroup = -1;
+      this.radioGroupLevel = -1;
+      this.radioGroupPrice = -1;
+      this.page = 1;
+      this.getCourses();
     }
   },
 
   created() {
     this.getCategoryInfo();
+    this.getCourses();
+    const paramsBeginner = {
+      categoryId: this.$route.params.id,
+      level: "Beginner",
+      page: 1,
+      size: 12
+    };
+    getCourse(paramsBeginner).then(res => {
+      this.courseBeginners = res.data.result;
+    });
+
+    const paramsTopCourse = {
+      categoryId: this.$route.params.id,
+      rating: 4,
+      page: 1,
+      size: 12
+    };
+    getCourse(paramsTopCourse).then(res => {
+      this.topCourses = res.data.result;
+    });
   }
 };
 </script>

@@ -11,49 +11,55 @@
         </v-carousel>
       </v-col>
       <v-col cols="12" class="pb-0" v-if="!isLecture">
-        <div class="text-h5">Top Best Sellers</div>
+        <div class="text-h5 font-weight-bold mt-3">Top Best Sellers</div>
       </v-col>
       <v-col cols="12" class="d-flex" v-if="!isLecture">
         <v-row>
-          <v-col cols="2" v-for="course in category.courses" :key="course.id">
+          <v-col cols="2" v-for="item in bestSellers" :key="item.id">
             <course-intro
-              :courseId="course.id"
-              :courseImage="course.imageUrl"
-              :courseName="course.name"
-              :courseTitle="course.title"
-              :coursePrice="course.price"
+              :courseId="item.course.id"
+              :courseImage="item.course.imageUrl"
+              :courseName="item.course.name"
+              :courseTitle="item.course.title"
+              :coursePrice="item.course.price"
+              :courseRatingAvg="item.ratingAvg"
+              :totalRatings="item.totalRatings"
             />
           </v-col>
         </v-row>
       </v-col>
       <v-col cols="12" class="pb-0" v-if="!isLecture">
-        <div class="text-h5">Super Deals</div>
+        <div class="text-h5 font-weight-bold mt-3">For newbies</div>
       </v-col>
       <v-col cols="12" class="d-flex" v-if="!isLecture">
         <v-row>
-          <v-col cols="2" v-for="course in category.courses" :key="course.id">
+          <v-col cols="2" v-for="course in courseNewbies" :key="course.id">
             <course-intro
               :courseId="course.id"
               :courseImage="course.imageUrl"
               :courseName="course.name"
               :courseTitle="course.title"
               :coursePrice="course.price"
+              :courseRatingAvg="course.ratingAvg"
+              :totalRatings="course.totalRatings"
             />
           </v-col>
         </v-row>
       </v-col>
       <v-col cols="12" class="pb-0" v-if="!isLecture">
-        <div class="text-h5">Recommended for you</div>
+        <div class="text-h5 font-weight-bold mt-3">Recommended for you</div>
       </v-col>
       <v-col cols="12" class="d-flex" v-if="!isLecture">
         <v-row>
-          <v-col cols="2" v-for="course in category.courses" :key="course.id">
+          <v-col cols="2" v-for="course in recommend" :key="course.id">
             <course-intro
               :courseId="course.id"
               :courseImage="course.imageUrl"
               :courseName="course.name"
               :courseTitle="course.title"
               :coursePrice="course.price"
+              :courseRatingAvg="course.ratingAvg"
+              :totalRatings="course.totalRatings"
             />
           </v-col>
         </v-row>
@@ -119,24 +125,29 @@ import { mapGetters } from "vuex";
 import CourseIntro from "@/components/course/CourseIntro.vue";
 import CoreButton from "@/components/core/CoreButton.vue";
 import { getCategory } from "@/api/category";
+import { getTopCourses } from "@/api/statistical";
+import { getCourse } from "@/api/course";
 export default {
   components: { CourseIntro, CoreButton },
   data: () => ({
     category: {},
     items: [
       {
-        src: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg"
+        src:
+          "https://img-c.udemycdn.com/notices/featured_carousel_slide/image/4349ebec-262b-42c9-83fe-b1605a3ed5b1.jpg"
       },
       {
-        src: "https://cdn.vuetifyjs.com/images/carousel/sky.jpg"
+        src:
+          "https://img-c.udemycdn.com/notices/featured_carousel_slide/image/9ea59bc2-bd61-463e-9ce9-7e71e8e586ae.jpg"
       },
       {
-        src: "https://cdn.vuetifyjs.com/images/carousel/bird.jpg"
-      },
-      {
-        src: "https://cdn.vuetifyjs.com/images/carousel/planet.jpg"
+        src:
+          "https://img-c.udemycdn.com/notices/featured_carousel_slide/image/34c63aef-8d1f-483e-b0ea-0ead94879e56.jpg"
       }
-    ]
+    ],
+    bestSellers: [],
+    recommend: [],
+    courseNewbies: []
   }),
   computed: {
     ...mapGetters("auth", ["role"]),
@@ -158,6 +169,25 @@ export default {
 
   created() {
     this.getCategoryInfo();
+    getTopCourses().then(res => {
+      this.bestSellers = res.data;
+    });
+    const paramsRecommend = {
+      rating: 4,
+      page: 1,
+      size: 10
+    };
+    getCourse(paramsRecommend).then(res => {
+      this.recommend = res.data.result;
+    });
+    const paramsCourseNewbies = {
+      level: "Beginner",
+      page: 1,
+      size: 10
+    };
+    getCourse(paramsCourseNewbies).then(res => {
+      this.courseNewbies = res.data.result;
+    });
   }
 };
 </script>

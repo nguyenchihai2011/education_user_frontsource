@@ -84,19 +84,22 @@
           class="mx-auto"
           width="100%"
           tile
-          style="position: absolute; bottom: -120px"
-          v-if="courses.length > 0"
+          style="position: absolute; z-index: 999;"
+          :style="{ bottom: -cardBottom + 'px' }"
+          v-show="course.result && course.result.length > 0"
+          ref="cardRef"
+          id="header-card"
         >
           <v-list dense>
             <v-list-item-group color="primary">
               <v-list-item
-                v-for="item in courses"
+                v-for="item in course.result"
                 :key="item.id"
                 @click="$router.push(`/course/${item.id}`)"
               >
                 <v-row class="mb-1">
                   <v-col cols="2" class="d-flex align-center">
-                    <v-img :src="item.imageUrl"></v-img
+                    <v-img :src="item.imageUrl" max-width="100px"></v-img
                   ></v-col>
                   <v-col cols="10" class="d-flex align-center">
                     <v-list-item-title v-text="item.name"></v-list-item-title
@@ -122,13 +125,8 @@
             <template v-slot:activator="{ on, attrs }">
               <v-hover>
                 <div v-bind="attrs" v-on="on">
-                  <v-avatar
-                    v-if="!avatarUrl"
-                    color="teal"
-                    size="48"
-                    class="ma-4"
-                  >
-                    <img :src="avatarUrl" alt="John" />
+                  <v-avatar v-if="avatarUrl !== 'null'" size="48" class="ma-4">
+                    <img :src="avatarUrl" />
                   </v-avatar>
                   <v-avatar v-else color="teal" size="48" class="ma-4">
                     <v-icon dark>
@@ -219,13 +217,15 @@ export default {
       abortController: new AbortController(),
       categories: [],
       search: "",
-      courses: [],
-      debounceSearch: () => {}
+      course: {},
+      debounceSearch: () => {},
+      cardBottom: "0px" // Thiết lập giá trị mặc định ban đầu
     };
   },
 
   computed: {
     ...mapGetters("auth", ["token", "role", "avatarUrl"]),
+    ...mapGetters("alanAI", ["command", "value"]),
     isLogged() {
       return !!this.token;
     },
@@ -237,6 +237,12 @@ export default {
   watch: {
     search(val) {
       this.debounceSearch();
+    },
+
+    command(val) {
+      if (val === "search") {
+        this.search = this.value;
+      }
     }
   },
 
@@ -266,13 +272,18 @@ export default {
     },
 
     fetchCourse() {
-      getCourse({ search: this.search }).then(res => {
-        if (this.search) {
-          this.courses = res.data;
-        } else {
-          this.courses = [];
-        }
-      });
+      getCourse({ search: this.search })
+        .then(res => {
+          if (this.search) {
+            this.course = res.data;
+          } else {
+            this.course = {};
+          }
+        })
+        .finally(() => {
+          this.cardBottom =
+            document.getElementById("header-card").clientHeight * 1.5;
+        });
     },
 
     navigateTo(id) {

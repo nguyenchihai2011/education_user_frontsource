@@ -16,7 +16,10 @@
                 size="12"
               ></v-rating>
               <div class="purple--text text--lighten-4 ml-1">
-                4.5 (1020 ratings)
+                {{ ratingCourse.averageRating }} ({{
+                  ratingCourse.totalRatings
+                }}
+                ratings)
               </div>
             </div>
             <div>
@@ -219,19 +222,25 @@
           <div class="mt-15">
             <v-card-title class="text-h5 font-weight-bold">
               <v-icon color="amber">mdi-star</v-icon>
-              <div class="text-h6 font-weight-bold">4.5 course rating</div>
+              <div class="text-h6 font-weight-bold">
+                {{ ratingCourse.averageRating }} course rating
+              </div>
             </v-card-title>
             <v-row class="px-4">
-              <v-col cols="6">
+              <v-col
+                cols="6"
+                v-for="item in ratingCourse.ratingsWithAverage"
+                :key="item.id"
+              >
                 <v-card>
                   <div class="d-flex align-center">
-                    <v-avatar color="teal" size="48" class="ma-4">
-                      <span class="white--text text-h5">48</span>
+                    <v-avatar size="48" class="mr-4">
+                      <img :src="item.avatarUrl" alt="John" />
                     </v-avatar>
                     <div>
-                      <div class="font-weight-bold">Shine L.</div>
+                      <div class="font-weight-bold">{{ item.name }}</div>
                       <v-rating
-                        :value="4.5"
+                        :value="item.start"
                         color="amber"
                         dense
                         half-increments
@@ -239,87 +248,12 @@
                         size="12"
                       ></v-rating>
                     </div>
-                    <v-divider></v-divider>
+                    <v-spacer></v-spacer>
                     <v-btn text small>
                       <v-icon size="20">mdi-dots-vertical</v-icon>
                     </v-btn>
                   </div>
-                  <div class="pa-4 pb-6">Easy to understand</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6">
-                <v-card>
-                  <div class="d-flex align-center">
-                    <v-avatar color="teal" size="48" class="ma-4">
-                      <span class="white--text text-h5">48</span>
-                    </v-avatar>
-                    <div>
-                      <div class="font-weight-bold">Shine L.</div>
-                      <v-rating
-                        :value="4.5"
-                        color="amber"
-                        dense
-                        half-increments
-                        readonly
-                        size="12"
-                      ></v-rating>
-                    </div>
-                    <v-divider></v-divider>
-                    <v-btn text small>
-                      <v-icon size="20">mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </div>
-                  <div class="pa-4 pb-6">Easy to understand</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6">
-                <v-card>
-                  <div class="d-flex align-center">
-                    <v-avatar color="teal" size="48" class="ma-2">
-                      <span class="white--text text-h5">48</span>
-                    </v-avatar>
-                    <div>
-                      <div class="font-weight-bold">Shine L.</div>
-                      <v-rating
-                        :value="4.5"
-                        color="amber"
-                        dense
-                        half-increments
-                        readonly
-                        size="12"
-                      ></v-rating>
-                    </div>
-                    <v-divider></v-divider>
-                    <v-btn text small>
-                      <v-icon size="20">mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </div>
-                  <div class="pa-4 pb-6">Easy to understand</div>
-                </v-card>
-              </v-col>
-              <v-col cols="6">
-                <v-card>
-                  <div class="d-flex align-center">
-                    <v-avatar color="teal" size="48" class="ma-2">
-                      <span class="white--text text-h5">48</span>
-                    </v-avatar>
-                    <div>
-                      <div class="font-weight-bold">Shine L.</div>
-                      <v-rating
-                        :value="4.5"
-                        color="amber"
-                        dense
-                        half-increments
-                        readonly
-                        size="12"
-                      ></v-rating>
-                    </div>
-                    <v-divider></v-divider>
-                    <v-btn text small>
-                      <v-icon size="20">mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </div>
-                  <div class="pa-4 pb-6">Easy to understand</div>
+                  <div class="pa-4 pb-6">{{ item.content }}</div>
                 </v-card>
               </v-col>
             </v-row>
@@ -358,6 +292,7 @@ import LessonDialog from "@/components/lesson/LessonDialog.vue";
 import CoreButton from "@/components/core/CoreButton.vue";
 import VideoDialog from "@/components/video/VideoDialog.vue";
 import { getCourseById } from "@/api/course";
+import { getRatingsCourse } from "@/api/ratings";
 import { mapActions, mapGetters } from "vuex";
 export default {
   components: {
@@ -377,7 +312,8 @@ export default {
       lessons: [],
       isVideoDialog: false,
       title: "",
-      videoUrl: ""
+      videoUrl: "",
+      ratingCourse: {}
     };
   },
 
@@ -440,6 +376,10 @@ export default {
     getCourseById(this.$route.params.id).then(res => {
       this.course = res.data;
       this.isShow = true;
+    });
+
+    getRatingsCourse(this.$route.params.id).then(res => {
+      this.ratingCourse = res.data;
     });
   }
 };

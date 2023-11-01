@@ -51,18 +51,20 @@
                   ><v-icon>mdi-send</v-icon></v-btn
                 >
               </div>
-              <div
-                class="d-flex mb-6"
-                v-for="comment in comments"
-                :key="comment.id"
-              >
-                <v-avatar size="48" class="mr-4">
-                  <img :src="comment.avatarUrl" alt="John" />
-                </v-avatar>
-                <div>
-                  <div class="font-weight-bold">{{ comment.name }}</div>
+              <div style="max-height: 600px; overflow-y: auto;">
+                <div
+                  class="d-flex mb-6"
+                  v-for="comment in comments"
+                  :key="comment.id"
+                >
+                  <v-avatar size="48" class="mr-4">
+                    <img :src="comment.avatarUrl" alt="John" />
+                  </v-avatar>
                   <div>
-                    {{ comment.content }}
+                    <div class="font-weight-bold">{{ comment.name }}</div>
+                    <div>
+                      {{ comment.content }}
+                    </div>
                   </div>
                 </div>
               </div>

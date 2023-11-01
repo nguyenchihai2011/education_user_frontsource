@@ -13,14 +13,16 @@
         <div class="text-caption">{{ lectureName }}</div>
         <div class="d-flex mx-0">
           <v-rating
-            :value="4.2"
+            :value="courseRatingAvg"
             color="amber"
             dense
             half-increments
             readonly
             size="12"
           ></v-rating>
-          <div class="grey--text ml-1">4.2 (413)</div>
+          <div class="grey--text ml-1">
+            {{ courseRatingAvg }} ({{ totalRatings }})
+          </div>
         </div>
         <!-- <div class="text-caption">
           38 total mins <v-icon>mdi-circle-small</v-icon>7
@@ -29,23 +31,23 @@
       </v-col>
       <v-col cols="3" v-if="showPrice">
         <div class="py-0 px-4 font-weight-bold">{{ coursePrice }} USD</div>
-        <core-button
+        <!-- <core-button
           class="mt-2 py-5 deep-purple lighten-2 white--text text-none"
         >
           <v-icon>mdi-cart-plus</v-icon>
           <div class="ml-2">Add to cart</div>
-        </core-button>
+        </core-button> -->
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-import CoreButton from "@/components/core/CoreButton.vue";
+// import CoreButton from "@/components/core/CoreButton.vue";
 export default {
-  components: {
-    CoreButton
-  },
+  // components: {
+  //   CoreButton
+  // },
 
   methods: {
     navigateToCourse() {
@@ -75,6 +77,12 @@ export default {
     showPrice: {
       type: Boolean,
       default: true
+    },
+    courseRatingAvg: {
+      type: Number
+    },
+    totalRatings: {
+      type: Number
     }
   }
 };

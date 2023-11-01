@@ -5,7 +5,7 @@
         <v-col cols="12" class="d-flex align-center justify-space-between mt-6">
           <div class="text-h4">My learning</div>
         </v-col>
-        <v-col v-if="student.orders.length === 0" cols="12">
+        <v-col v-if="student.orders && student.orders.length === 0" cols="12">
           <div class="text-h6 font-weight-regular">
             No courses have been created yet
           </div>
@@ -22,9 +22,11 @@
                 :courseImage="orderDetail.course.imageUrl"
                 :courseName="orderDetail.course.name"
                 :courseTitle="orderDetail.course.title"
-                :coursePrice="orderDetail.course.price"
+                :coursePrice="orderDetail.price"
                 :lectureName="lectureFullName(orderDetail.course.lecture)"
                 :showPrice="false"
+                :courseRatingAvg="orderDetail.course.ratingAvg"
+                :totalRatings="orderDetail.course.totalRatings"
               ></course-details>
             </v-col>
           </v-row>

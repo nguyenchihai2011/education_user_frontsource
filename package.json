@@ -12,6 +12,7 @@
     "build-deploy": "npm run build && npm run deploy"
   },
   "dependencies": {
+    "@alan-ai/alan-sdk-web": "^1.8.54",
     "@aspnet/signalr": "^1.0.27",
     "apexcharts": "^3.44.0",
     "axios": "^1.5.1",
@@ -37,7 +38,7 @@
     "sass": "^1.32.0",
     "sass-loader": "^10.0.0",
     "vue-cli-plugin-vuetify": "~2.1.0",
-    "vue-template-compiler": "^2.6.11",
+    "vue-template-compiler": "^2.7.15",
     "vuetify-loader": "^1.7.0"
   },
   "browserslist": [
