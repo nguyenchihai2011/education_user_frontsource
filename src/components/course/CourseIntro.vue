@@ -11,6 +11,7 @@
     <v-img
       @click="$router.push(`/course/${courseId}`)"
       :src="courseImage"
+      style="height: 130px;"
     ></v-img>
 
     <v-card-title>{{ courseName }}</v-card-title>

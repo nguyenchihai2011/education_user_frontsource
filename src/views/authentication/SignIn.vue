@@ -39,6 +39,7 @@
 
 <script>
 import { signIn, getUserInfo } from "@/api/auth";
+import { getCartId } from "@/api/cart";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -56,6 +57,7 @@ export default {
     ...mapActions("auth", [
       "setToken",
       "setUserId",
+      "setCartId",
       "setRole",
       "setAvatarUrl",
       "setLectureId",
@@ -85,6 +87,9 @@ export default {
               }
             } else {
               this.setStudentId(res.data.id);
+              getCartId(res.data.id).then(res => {
+                this.setCartId(res.data.id);
+              });
               this.$router.push("/");
             }
           });

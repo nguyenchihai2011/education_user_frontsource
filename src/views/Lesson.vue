@@ -3,9 +3,21 @@
     <v-row no-gutters>
       <v-col>
         <v-card style="position: relative" :key="videoCard">
-          <video controls width="100%" height="500">
+          <video v-if="showVideo" controls width="100%" height="500">
             <source :src="lesson.videoUrl" />
           </video>
+          <div v-else>
+            <div class="text-h3 pt-6 pl-4">{{ this.question.question }}</div>
+            <div class="text-h6 pt-4 pl-4 pb-6">Select correct answer:</div>
+            <div v-for="answer in question.answers" :key="answer.id">
+              <v-btn
+                class="text-none ml-4 mb-2"
+                style="min-width: 600px;"
+                @click="checkAnswer(answer)"
+                >{{ answer.value }}</v-btn
+              >
+            </div>
+          </div>
           <v-btn
             class="rounded-circle"
             absolute
@@ -29,7 +41,42 @@
         <v-tabs-items v-model="tab">
           <v-tab-item>
             <v-card flat>
-              <v-card-text> </v-card-text>
+              <v-card-text>
+                <div class="d-flex align-center">
+                  <v-icon color="success" large>mdi-check</v-icon>
+                  <div class="text-h6 ml-2">
+                    Build 16 web development projects for your portfolio, ready
+                    to apply for junior developer jobs.
+                  </div>
+                </div>
+                <div class="d-flex align-center">
+                  <v-icon color="success" large>mdi-check</v-icon>
+                  <div class="text-h6 ml-2">
+                    After the course you will be able to build ANY website you
+                    want.
+                  </div>
+                </div>
+                <div class="d-flex align-center">
+                  <v-icon color="success" large>mdi-check</v-icon>
+                  <div class="text-h6 ml-2">
+                    Learn the latest technologies, including Javascript, React,
+                    Node and even Web3 development.
+                  </div>
+                </div>
+                <div class="d-flex align-center">
+                  <v-icon color="success" large>mdi-check</v-icon>
+                  <div class="text-h6 ml-2">
+                    Build fully-fledged websites and web apps for your startup
+                    or business.
+                  </div>
+                </div>
+                <div class="d-flex align-center">
+                  <v-icon color="success" large>mdi-check</v-icon>
+                  <div class="text-h6 ml-2">
+                    Work as a freelance web developer.
+                  </div>
+                </div>
+              </v-card-text>
             </v-card>
           </v-tab-item>
           <v-tab-item>
@@ -76,13 +123,13 @@
       <v-col v-if="isNavigation" cols="3">
         <v-card
           class="overflow-y-auto"
-          style="position: fixed; height: calc(100vh - 80px)"
+          style="position: fixed; height: calc(100vh - 80px); width: 380px;"
           flat
         >
           <div class="d-flex justify-space-between align-center py-2">
             <div class="ml-4 text-h5 font-ưeight-bold">Course Content</div>
             <div class="d-flex justify-end align-center">
-              <progress-chart :data="dataProgress" :width="80" :height="80" />
+              <!-- <progress-chart :data="dataProgress" :width="80" :height="80" /> -->
               <v-btn @click="isNavigation = false" text>
                 <v-icon>mdi-close</v-icon>
               </v-btn>
@@ -101,20 +148,37 @@
                 v-for="lesson in item.lessons"
                 :key="lesson.id"
               >
-                <v-card flat class="d-flex align-start">
-                  <v-checkbox
+                <v-card flat class="d-flex flex-column justify-start">
+                  <!-- <v-checkbox
                     v-model="lesson.studentLessons[0].isLock"
                     class="ma-0 mr-2"
                     @click="updateProgress(lesson.id)"
-                  ></v-checkbox>
+                  ></v-checkbox> -->
                   <v-card-actions
                     @click="
-                      $router.push(`/course/${course.id}/lesson/${lesson.id}`)
+                      () => {
+                        $router.push(
+                          `/course/${course.id}/lesson/${lesson.id}`
+                        );
+                        showVideo = true;
+                      }
                     "
                   >
                     <div class="font-weight-bold">{{ lesson.name }}</div>
                     <v-icon class="mr-2" size="20">mdi-television-play</v-icon>
                   </v-card-actions>
+                  <div class="d-flex">
+                    <div v-for="(quiz, index) in lesson.quizzes" :key="index">
+                      <v-btn
+                        @click="updateQuestion(quiz)"
+                        outlined
+                        rounded
+                        small
+                        class="mr-1"
+                        >{{ index + 1 }}</v-btn
+                      >
+                    </div>
+                  </div>
                 </v-card>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -133,8 +197,8 @@ import {
   updateProgress,
   getProgress
 } from "@/api/studentLesson";
-import { mapGetters } from "vuex";
-import ProgressChart from "@/components/app/ProgressChart.vue";
+import { mapGetters, mapActions } from "vuex";
+// import ProgressChart from "@/components/app/ProgressChart.vue";
 import { getCommentsCourse } from "@/api/comment";
 
 const connection = new signalR.HubConnectionBuilder()
@@ -145,7 +209,8 @@ const connection = new signalR.HubConnectionBuilder()
   .build();
 
 export default {
-  components: { CoreFooter, ProgressChart },
+  // components: { CoreFooter, ProgressChart },
+  components: { CoreFooter },
 
   data() {
     return {
@@ -158,12 +223,15 @@ export default {
       studentLessons: [],
       dataProgress: [],
       comments: [],
-      commentText: ""
+      commentText: "",
+      showVideo: true,
+      question: {}
     };
   },
 
   computed: {
-    ...mapGetters("auth", ["studentId", "userId", "avatarUrl"])
+    ...mapGetters("auth", ["studentId", "userId", "avatarUrl"]),
+    ...mapGetters("alanAI", ["command", "value"])
   },
 
   watch: {
@@ -172,15 +240,85 @@ export default {
         this.lesson = res.data;
         this.videoCard++;
       });
+    },
+
+    command(val) {
+      if (val === "navigateMyLearning") {
+        if (this.role === "Student") {
+          this.$router.push("/user/my-learning");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateMyTeaching") {
+        if (this.role === "Lecture") {
+          this.$router.push("/user/my-teaching");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateCart") {
+        if (this.role === "Student") {
+          this.$router.push("/cart");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateDashboard") {
+        this.$router.push("/");
+      } else if (val === "notunderstand") {
+        this.addSnackbar({
+          isShow: true,
+          text: "Sorry! I dont have understand your request.",
+          priority: "error",
+          timeout: 3000
+        });
+      }
     }
   },
 
   methods: {
+    ...mapActions("snackbar", ["addSnackbar"]),
     selectLesson(lessonId) {
       getLessonById(lessonId).then(res => {
         this.lesson = res.data;
         this.videoCard++;
       });
+    },
+
+    checkAnswer(item) {
+      if (item.isCorrect) {
+        this.addSnackbar({
+          isShow: true,
+          text: "Congratulation! This is true answer!",
+          priority: "success",
+          timeout: 3000
+        });
+      } else {
+        this.addSnackbar({
+          isShow: true,
+          text: "Oh no! This is wrong answer!",
+          priority: "error",
+          timeout: 3000
+        });
+      }
+    },
+
+    updateQuestion(item) {
+      this.question = item;
+      this.showVideo = false;
     },
 
     updateProgress(lessonId) {
@@ -236,9 +374,9 @@ export default {
       courseId: this.$route.params.courseId,
       studentId: this.studentId
     };
-    getProgress(progressParams).then(res => {
-      this.dataProgress = res.data;
-    });
+    // getProgress(progressParams).then(res => {
+    //   this.dataProgress = res.data;
+    // });
     this.getCommentsCourse();
   },
 
@@ -249,7 +387,6 @@ export default {
       .then(function() {
         console.log("SignalR Connected!");
         connection.on("ReceiveComment", () => {
-          console.log("agfagd");
           self.getCommentsCourse();
         });
       })

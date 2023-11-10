@@ -60,7 +60,7 @@
 import { mapGetters } from "vuex";
 import CoreDialog from "@/components/core/CoreDialog.vue";
 import CoreButton from "@/components/core/CoreButton.vue";
-import { addSection } from "@/api/section";
+import { addSection, getSectionById, updateSection } from "@/api/section";
 
 export default {
   components: { CoreDialog, CoreButton },
@@ -111,26 +111,42 @@ export default {
         name: this.sectionName,
         createAt: new Date().toISOString(),
         updateAt: new Date().toISOString(),
-        courseId: this.idInit
+        courseId: this.courseId
       };
-      addSection(payload).then(res => {
-        console.log(res.data);
+      addSection(payload).then(() => {
+        this.$emit("createSuccess");
       });
     },
 
-    async submit() {
-      this.createSection();
+    updateSection() {
+      const payload = {
+        id: this.idInit,
+        name: this.sectionName,
+        createAt: new Date().toISOString(),
+        updateAt: new Date().toISOString(),
+        courseId: this.courseId
+      };
+      updateSection(this.idInit, payload).then(() => {
+        this.$emit("createSuccess");
+      });
+    },
+
+    submit() {
+      if (this.action === "create") this.createSection();
+      else {
+        this.updateSection();
+      }
     },
 
     fetchData() {
-      //   getCategory(this.idInit).then(res => {
-      //     this.categoryName = res.data.name;
-      //   });
+      getSectionById(this.idInit).then(res => {
+        this.sectionName = res.data[0].name;
+      });
     }
   },
 
   created() {
-    // if (!this.isCreate) this.fetchData();
+    if (!this.isCreate) this.fetchData();
   },
 
   props: {
@@ -142,6 +158,9 @@ export default {
       default: "create"
     },
     idInit: {
+      type: Number
+    },
+    courseId: {
       type: Number
     }
   }

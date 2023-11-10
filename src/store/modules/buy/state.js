@@ -1,4 +1,6 @@
 export default {
   isBuyNow: false,
-  courseBuyNow: {}
+  courseBuyNow: {},
+  cartQuantity: 0,
+  listCourseSelectToBuy: []
 };

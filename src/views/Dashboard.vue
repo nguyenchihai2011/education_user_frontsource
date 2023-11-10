@@ -121,7 +121,7 @@
   </v-container>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import CourseIntro from "@/components/course/CourseIntro.vue";
 import CoreButton from "@/components/core/CoreButton.vue";
 import { getCategory } from "@/api/category";
@@ -151,6 +151,7 @@ export default {
   }),
   computed: {
     ...mapGetters("auth", ["role"]),
+    ...mapGetters("alanAI", ["command", "value"]),
     isStudent() {
       return this.role === "Student";
     },
@@ -159,7 +160,54 @@ export default {
     }
   },
 
+  watch: {
+    command(val) {
+      if (val === "navigateMyLearning") {
+        if (this.role === "Student") {
+          this.$router.push("/user/my-learning");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateMyTeaching") {
+        if (this.role === "Lecture") {
+          this.$router.push("/user/my-teaching");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateCart") {
+        if (this.role === "Student") {
+          this.$router.push("/cart");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "notunderstand") {
+        this.addSnackbar({
+          isShow: true,
+          text: "Sorry! I dont have understand your request.",
+          priority: "error",
+          timeout: 3000
+        });
+      }
+    }
+  },
+
   methods: {
+    ...mapActions("snackbar", ["addSnackbar"]),
     getCategoryInfo() {
       getCategory(1).then(res => {
         this.category = res.data;

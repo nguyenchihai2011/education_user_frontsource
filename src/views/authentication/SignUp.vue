@@ -61,6 +61,8 @@ import {
   getUserInfo
 } from "@/api/auth";
 
+import { createCart } from "@/api/cart";
+
 export default {
   components: {},
   data() {
@@ -93,7 +95,9 @@ export default {
       };
 
       if (this.isSignUpStudent) {
-        signUpStudent(payload).then(() => {});
+        signUpStudent(payload).then(res => {
+          createCart({ studentId: res.data.id }).then(res => console.log(res));
+        });
       } else {
         signUpLecture(payload).then(() => {});
       }
@@ -137,6 +141,7 @@ export default {
         .then(res => {
           this.setUserId(res.data.id);
           this.setRole(res.data.userType);
+
           this.createInitProfile();
           this.signIn();
         })

@@ -24,6 +24,11 @@ export default {
     localStorage.setItem("lectureId", lectureId);
   },
 
+  setCartId(state, cartId) {
+    state.cartId = cartId;
+    localStorage.setItem("cartId", cartId);
+  },
+
   setStudentId(state, studentId) {
     state.studentId = studentId;
     localStorage.setItem("studentId", studentId);

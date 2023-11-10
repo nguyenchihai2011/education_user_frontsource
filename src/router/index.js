@@ -29,6 +29,11 @@ const routes = [
         component: () => import("@/views/Lesson")
       },
       {
+        path: "/cart",
+        name: "Cart",
+        component: () => import("@/views/Cart")
+      },
+      {
         path: "/checkout",
         name: "Checkout",
         component: () => import("@/views/Checkout")
@@ -46,6 +51,11 @@ const routes = [
             path: "my-teaching",
             name: "MyTeaching",
             component: () => import("@/views/lecture/MyTeaching")
+          },
+          {
+            path: "revenue",
+            name: "Revenue",
+            component: () => import("@/views/lecture/Revenue")
           },
           {
             path: "my-cart",

@@ -8,4 +8,17 @@ const createProfileLecture = payload => {
   return apiClient.post(`/lecture`, payload);
 };
 
-export { changeProfileLecture, createProfileLecture };
+const getCourseYourselfLecture = params => {
+  return apiClient.get(`/courseoflecture`, { params });
+};
+
+const getRevenueLecture = lectureId => {
+  return apiClient.get(`/statistical/revenue/${lectureId}`);
+};
+
+export {
+  changeProfileLecture,
+  createProfileLecture,
+  getCourseYourselfLecture,
+  getRevenueLecture
+};

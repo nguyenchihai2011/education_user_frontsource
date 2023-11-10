@@ -19,6 +19,10 @@ export default {
     commit("setStudentId", studentId);
   },
 
+  setCartId({ commit }, cartId) {
+    commit("setCartId", cartId);
+  },
+
   setLectureId({ commit }, lectureId) {
     commit("setLectureId", lectureId);
   },

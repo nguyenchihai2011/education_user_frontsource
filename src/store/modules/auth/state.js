@@ -4,5 +4,6 @@ export default {
   lectureId: "",
   avatarUrl: "",
   studentId: "",
-  role: ""
+  role: "",
+  cartId: ""
 };

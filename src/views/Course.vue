@@ -6,22 +6,24 @@
           <v-col cols="8" class="pa-0">
             <div class="text-h4 my-2">{{ course.name }}</div>
             <div class="text-subtitle-1">{{ course.title }}</div>
-            <div class="d-flex mx-0 my-2">
-              <v-rating
-                :value="4.5"
-                color="amber"
-                dense
-                half-increments
-                readonly
-                size="12"
-              ></v-rating>
-              <div class="purple--text text--lighten-4 ml-1">
-                {{ ratingCourse.averageRating }} ({{
-                  ratingCourse.totalRatings
-                }}
-                ratings)
+            <v-btn text class="text-none pa-0">
+              <div class="d-flex mx-0 my-2">
+                <v-rating
+                  :value="4.5"
+                  color="amber"
+                  dense
+                  half-increments
+                  readonly
+                  size="12"
+                ></v-rating>
+                <div class="purple--text text--lighten-4 ml-1">
+                  {{ ratingCourse.averageRating }} ({{
+                    ratingCourse.totalRatings
+                  }}
+                  ratings)
+                </div>
               </div>
-            </div>
+            </v-btn>
             <div>
               Created by
               <span class="purple--text text--lighten-4"
@@ -51,11 +53,15 @@
                 >{{ course.price }} USD</v-card-title
               >
               <div v-if="!isLogged || (isStudent && !hasCourse)">
-                <!-- <v-card-title class="py-0">
-                  <v-btn class="text-none purple white--text" text width="100%"
+                <v-card-title class="py-0">
+                  <v-btn
+                    class="text-none purple white--text"
+                    text
+                    width="100%"
+                    @click="addToCart(course)"
                     >Add to card</v-btn
                   >
-                </v-card-title> -->
+                </v-card-title>
                 <v-card-title class="pt-2 pb-8">
                   <v-btn
                     class="text-none"
@@ -125,7 +131,7 @@
                 v-if="isLecture"
                 class="text-none"
                 outlined
-                @click.native="openSectionDialog()"
+                @click.native="openSectionDialog({}, 'create')"
               >
                 <v-icon>mdi-plus</v-icon>
                 Create new section
@@ -144,7 +150,26 @@
                     :key="item.id"
                   >
                     <v-expansion-panel-header class="font-weight-bold text-h6">
-                      {{ item.name }}
+                      <div style="min-width: 540px">{{ item.name }}</div>
+                      <v-menu v-if="isLecture" offset-y class="d-inline-block">
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn text v-bind="attrs" v-on="on">
+                            <v-icon>mdi-dots-vertical</v-icon>
+                          </v-btn>
+                        </template>
+                        <v-list>
+                          <v-list-item @click="openSectionDialog(item, 'edit')">
+                            <v-list-item-title class="d-flex justify-center">
+                              <v-icon>mdi-pencil</v-icon>
+                            </v-list-item-title>
+                          </v-list-item>
+                          <v-list-item @click="deleteSection(item)">
+                            <v-list-item-title class="d-flex justify-center">
+                              <v-icon>mdi-delete</v-icon>
+                            </v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content
                       v-for="lesson in item.lessons"
@@ -155,20 +180,63 @@
                           <v-col cols="1"
                             ><v-icon>mdi-presentation-play</v-icon></v-col
                           >
-                          <v-col cols="7"
-                            ><div>{{ lesson.name }}</div></v-col
-                          >
+                          <v-col cols="7">
+                            <div>{{ lesson.name }}</div>
+                            <div class="d-flex">
+                              <div
+                                v-for="(quiz, index) in lesson.quizzes"
+                                :key="index"
+                              >
+                                <v-btn class="mr-1" outlined rounded small>{{
+                                  index + 1
+                                }}</v-btn>
+                              </div>
+                            </div>
+                          </v-col>
                           <v-col cols="2">
                             <v-btn
                               text
                               class="d-flex justify-end text-none blue--text text-decoration-underline"
                               @click="openVideoDialog(lesson)"
+                              v-if="lesson.isReview"
                             >
                               Preview
                             </v-btn>
                           </v-col>
                           <v-col cols="2"
-                            ><div class="d-flex justify-end">01:43</div></v-col
+                            ><div class="d-flex justify-end">
+                              <v-menu
+                                v-if="isLecture"
+                                offset-y
+                                class="d-inline-block"
+                              >
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn text v-bind="attrs" v-on="on">
+                                    <v-icon>mdi-dots-vertical</v-icon>
+                                  </v-btn>
+                                </template>
+                                <v-list>
+                                  <v-list-item
+                                    @click="
+                                      openLessonDialog(item, lesson, 'edit')
+                                    "
+                                  >
+                                    <v-list-item-title
+                                      class="d-flex justify-center"
+                                    >
+                                      <v-icon>mdi-pencil</v-icon>
+                                    </v-list-item-title>
+                                  </v-list-item>
+                                  <v-list-item @click="deleteLesson(lesson)">
+                                    <v-list-item-title
+                                      class="d-flex justify-center"
+                                    >
+                                      <v-icon>mdi-delete</v-icon>
+                                    </v-list-item-title>
+                                  </v-list-item>
+                                </v-list>
+                              </v-menu>
+                            </div></v-col
                           >
                         </v-row>
                       </v-card>
@@ -179,10 +247,10 @@
                           v-if="isLecture"
                           class="text-none"
                           outlined
-                          @click.native="openLessonDialog(item.id)"
+                          @click.native="openLessonDialog(item, {}, 'create')"
                         >
                           <v-icon>mdi-plus</v-icon>
-                          Create new section
+                          Create new lesson
                         </core-button>
                       </div>
                     </v-expansion-panel-content>
@@ -190,6 +258,17 @@
                 </v-expansion-panels>
               </v-col>
             </v-row>
+            <div class="d-flex justify-end">
+              <core-button
+                v-if="isLecture"
+                class="text-none mt-4"
+                outlined
+                @click.native="openQuizDialog({}, 'create')"
+              >
+                <v-icon>mdi-plus</v-icon>
+                Create new quiz
+              </core-button>
+            </div>
           </div>
           <div class="mt-15">
             <v-card-title class="text-h5 font-weight-bold">
@@ -221,9 +300,11 @@
           </div>
           <div class="mt-15">
             <v-card-title class="text-h5 font-weight-bold">
-              <v-icon color="amber">mdi-star</v-icon>
-              <div class="text-h6 font-weight-bold">
-                {{ ratingCourse.averageRating }} course rating
+              <div class="d-flex">
+                <v-icon color="amber">mdi-star</v-icon>
+                <div class="text-h6 font-weight-bold">
+                  {{ ratingCourse.averageRating }} course rating
+                </div>
               </div>
             </v-card-title>
             <v-row class="px-4">
@@ -258,23 +339,44 @@
               </v-col>
             </v-row>
           </div>
-          <v-btn class="text-none ml-4 mt-4" outlined>Show all review</v-btn>
+          <v-btn
+            v-if="
+              ratingCourse.ratingsWithAverage &&
+                ratingCourse.ratingsWithAverage.length > 0
+            "
+            class="text-none ml-4 mt-4"
+            outlined
+            >Show all review</v-btn
+          >
         </v-col>
       </v-row>
     </v-container>
     <section-dialog
       v-if="isSectionDialog"
       v-model="isSectionDialog"
-      :idInit="course.id"
+      :idInit="sectionId"
+      :courseId="course.id"
+      :action="sectionAction"
       @closeDialog="closeDialog()"
+      @createSuccess="createSectionSuccess()"
     ></section-dialog>
     <lesson-dialog
       v-if="isLessonDialog"
       v-model="isLessonDialog"
       :sectionId="sectionId"
+      :action="lessonAction"
       :idInit="lessonId"
       @closeDialog="closeDialog()"
+      @createSuccess="createLessonSuccess()"
     ></lesson-dialog>
+    <quiz-dialog
+      v-if="isQuizDialog"
+      v-model="isQuizDialog"
+      :action="'create'"
+      :courseId="course.id"
+      @closeDialog="closeDialog()"
+      @createSuccess="createLessonSuccess()"
+    ></quiz-dialog>
     <video-dialog
       v-if="isVideoDialog"
       v-model="isVideoDialog"
@@ -289,17 +391,22 @@
 import _ from "lodash";
 import SectionDialog from "@/components/section/SectionDialog.vue";
 import LessonDialog from "@/components/lesson/LessonDialog.vue";
+import QuizDialog from "@/components/quiz/QuizDialog.vue";
 import CoreButton from "@/components/core/CoreButton.vue";
 import VideoDialog from "@/components/video/VideoDialog.vue";
 import { getCourseById } from "@/api/course";
 import { getRatingsCourse } from "@/api/ratings";
+import { deleteSection } from "@/api/section";
+import { deleteLesson } from "@/api/lesson";
+import { createCartDetails } from "@/api/cartDetails";
 import { mapActions, mapGetters } from "vuex";
 export default {
   components: {
     SectionDialog,
     LessonDialog,
     CoreButton,
-    VideoDialog
+    VideoDialog,
+    QuizDialog
   },
   data() {
     return {
@@ -307,19 +414,24 @@ export default {
       isShow: false,
       isSectionDialog: false,
       isLessonDialog: false,
+      isQuizDialog: false,
       lessonId: undefined,
       sectionId: undefined,
       lessons: [],
       isVideoDialog: false,
       title: "",
       videoUrl: "",
-      ratingCourse: {}
+      ratingCourse: {},
+      sectionAction: "",
+      lessonAction: ""
     };
   },
 
   computed: {
-    ...mapGetters("auth", ["role", "token"]),
+    ...mapGetters("auth", ["role", "token", "cartId"]),
+    ...mapGetters("buy", ["listCourseSelectToBuy", "cartQuantity"]),
     ...mapGetters("yourself", ["coursesOfStudent"]),
+    ...mapGetters("alanAI", ["command", "value"]),
 
     isLogged() {
       return !!this.token;
@@ -338,19 +450,115 @@ export default {
     }
   },
 
+  watch: {
+    command(val) {
+      if (val === "navigateMyLearning") {
+        if (this.role === "Student") {
+          this.$router.push("/user/my-learning");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateMyTeaching") {
+        if (this.role === "Lecture") {
+          this.$router.push("/user/my-teaching");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateCart") {
+        if (this.role === "Student") {
+          this.$router.push("/cart");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateDashboard") {
+        this.$router.push("/");
+      } else if (val === "notunderstand") {
+        this.addSnackbar({
+          isShow: true,
+          text: "Sorry! I dont have understand your request.",
+          priority: "error",
+          timeout: 3000
+        });
+      }
+    }
+  },
+
   methods: {
-    ...mapActions("buy", ["setIsBuyNow", "setCourseBuyNow"]),
+    ...mapActions("buy", [
+      "setIsBuyNow",
+      "setCourseBuyNow",
+      "setCartQuantity",
+      "setListCourseSelectToBuy"
+    ]),
+    ...mapActions("snackbar", ["addSnackbar"]),
     formatDate(date) {
       const result = new Date(date);
       return result.toLocaleDateString("en-GB");
     },
-    openSectionDialog() {
+    openSectionDialog(item, action) {
       this.isSectionDialog = true;
+      this.sectionAction = action;
+      if (!_.isEmpty(item)) {
+        this.sectionId = item.id;
+      } else {
+        this.sectionId = "";
+      }
     },
 
-    openLessonDialog(sectionId) {
-      this.sectionId = sectionId;
+    openQuizDialog(item, action) {
+      this.isQuizDialog = true;
+      // this.sectionAction = action;
+      // if (!_.isEmpty(item)) {
+      //   this.sectionId = item.id;
+      // } else {
+      //   this.sectionId = "";
+      // }
+    },
+
+    openLessonDialog(section, item, action) {
+      this.sectionId = section.id;
       this.isLessonDialog = true;
+      this.lessonAction = action;
+      if (!_.isEmpty(item)) {
+        this.lessonId = item.id;
+      } else {
+        this.lessonId = "";
+      }
+    },
+
+    deleteLesson(item) {
+      deleteLesson(item.id).then(() => {
+        getCourseById(this.$route.params.id).then(res => {
+          this.course = res.data;
+          this.isShow = true;
+        });
+        this.closeDialog();
+      });
+    },
+
+    deleteSection(item) {
+      deleteSection(item.id).then(() => {
+        getCourseById(this.$route.params.id).then(res => {
+          this.course = res.data;
+          this.isShow = true;
+        });
+        this.closeDialog();
+      });
     },
 
     openVideoDialog(lesson) {
@@ -363,12 +571,43 @@ export default {
       this.isSectionDialog = false;
       this.isLessonDialog = false;
       this.isVideoDialog = false;
+      this.isQuizDialog = false;
     },
 
     buyNow() {
       this.setIsBuyNow(true);
       this.setCourseBuyNow(this.course);
       this.$router.push("/checkout");
+    },
+
+    createSectionSuccess() {
+      this.closeDialog();
+      getCourseById(this.$route.params.id).then(res => {
+        this.course = res.data;
+        this.isShow = true;
+      });
+    },
+
+    createLessonSuccess() {
+      this.closeDialog();
+      getCourseById(this.$route.params.id).then(res => {
+        this.course = res.data;
+        this.isShow = true;
+      });
+    },
+
+    addToCart(item) {
+      if (!this.listCourseSelectToBuy.includes(item.id)) {
+        createCartDetails({ cartId: this.cartId, courseId: item.id }).then(
+          () => {
+            this.setCartQuantity(this.cartQuantity + 1);
+            this.listCourseSelectToBuy = this.listCourseSelectToBuy.push(
+              item.id
+            );
+            this.setListCourseSelectToBuy(listCourseSelectToBuy);
+          }
+        );
+      }
     }
   },
 

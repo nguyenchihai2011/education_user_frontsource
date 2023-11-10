@@ -26,7 +26,7 @@
           offset-y
           nudge-bottom="35"
           close-delay="300"
-          v-if="isStudent"
+          v-if="!isLecture"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-hover v-slot="{ hover }">
@@ -69,7 +69,7 @@
       </v-col>
       <v-col cols="5" class="d-flex align-center" style="position: relative;">
         <v-text-field
-          v-if="isStudent"
+          v-if="!isLecture"
           v-model="search"
           outlined
           prepend-inner-icon="mdi-magnify"
@@ -113,7 +113,20 @@
       <v-divider></v-divider>
       <v-col cols="2" class="d-flex justify-end align-center">
         <div v-if="isLogged" class="d-flex align-center">
-          <v-btn v-if="isStudent" text><v-icon>mdi-cart</v-icon></v-btn>
+          <v-badge bordered overlap class="mr-2" v-if="isStudent">
+            <template v-slot:badge>
+              <div>{{ cartQuantity }}</div>
+            </template>
+            <v-btn
+              v-if="isStudent"
+              link
+              to="/cart"
+              text
+              style="background-color: transparent !important;"
+              ><v-icon>mdi-cart</v-icon></v-btn
+            ></v-badge
+          >
+
           <v-menu
             :key="userKey"
             open-on-hover
@@ -161,7 +174,7 @@
                 </v-list-item>
               </v-hover>
               <v-hover v-if="!isStudent" v-slot:default>
-                <v-list-item link to="">
+                <v-list-item link to="/user/revenue">
                   <div>Revenue</div>
                 </v-list-item>
               </v-hover>
@@ -209,6 +222,7 @@ import { getListCategory } from "@/api/category";
 import CoreButton from "@/components/core/CoreButton.vue";
 import { getCourse } from "@/api/course";
 import _ from "lodash";
+import { getCartId } from "@/api/cart";
 export default {
   components: { CoreButton },
   data() {
@@ -219,18 +233,22 @@ export default {
       search: "",
       course: {},
       debounceSearch: () => {},
-      cardBottom: "0px" // Thiết lập giá trị mặc định ban đầu
+      cardBottom: "0px" // Thiết lập giá trị mặc định ban đầu,
     };
   },
 
   computed: {
-    ...mapGetters("auth", ["token", "role", "avatarUrl"]),
+    ...mapGetters("auth", ["token", "role", "avatarUrl", "cartId"]),
+    ...mapGetters("buy", ["cartQuantity"]),
     ...mapGetters("alanAI", ["command", "value"]),
     isLogged() {
       return !!this.token;
     },
     isStudent() {
       return this.role === "Student";
+    },
+    isLecture() {
+      return this.role === "Lecture";
     }
   },
 
@@ -243,11 +261,18 @@ export default {
       if (val === "search") {
         this.search = this.value;
       }
+    },
+
+    value(val) {
+      if (this.command === "search") {
+        this.search = val;
+      }
     }
   },
 
   methods: {
     ...mapActions("auth", ["unsetAuth"]),
+    ...mapActions("buy", ["setCartQuantity"]),
     fetchCategories(params = {}) {
       this.abortController.abort();
       this.abortController = new AbortController();
@@ -293,6 +318,9 @@ export default {
 
   created() {
     this.fetchCategories();
+    getCartId(this.cartId).then(res => {
+      this.setCartQuantity(res.data.cartDetails.length);
+    });
     this.debounceSearch = _.debounce(this.fetchCourse, 1000);
   }
 };

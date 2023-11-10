@@ -8,4 +8,12 @@ const addLesson = payload => {
   return apiClient.post("/lesson", payload);
 };
 
-export { getLessonById, addLesson };
+const updateLesson = (id, payload) => {
+  return apiClient.put(`/lesson/${id}`, payload);
+};
+
+const deleteLesson = id => {
+  return apiClient.delete(`/lesson/${id}`);
+};
+
+export { getLessonById, addLesson, updateLesson, deleteLesson };

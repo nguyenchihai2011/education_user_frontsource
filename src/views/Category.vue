@@ -159,6 +159,8 @@ import CourseIntro from "@/components/course/CourseIntro.vue";
 import CourseDetails from "@/components/course/CourseDetails.vue";
 import { getCategory } from "@/api/category";
 import { getCourse } from "@/api/course";
+import { mostPurchaseCourse, topRatingCourse } from "@/api/alanAI";
+import { mapGetters, mapActions } from "vuex";
 export default {
   components: { CourseIntro, CourseDetails },
   data() {
@@ -190,6 +192,10 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters("alanAI", ["command", "value"])
+  },
+
   watch: {
     "$route.params.id"() {
       this.getCategoryInfo();
@@ -197,10 +203,77 @@ export default {
 
     page() {
       this.getCourses();
+    },
+
+    command(val) {
+      if (val === "navigateMyLearning") {
+        if (this.role === "Student") {
+          this.$router.push("/user/my-learning");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateMyTeaching") {
+        if (this.role === "Lecture") {
+          this.$router.push("/user/my-teaching");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateCart") {
+        if (this.role === "Student") {
+          this.$router.push("/cart");
+        } else {
+          this.addSnackbar({
+            isShow: true,
+            text: "You not have permission!",
+            priority: "error",
+            timeout: 3000
+          });
+        }
+      } else if (val === "navigateDashboard") {
+        this.$router.push("/");
+      } else if (val === "top1purchasescourse") {
+        const params = {
+          categoryName: this.value
+        };
+        mostPurchaseCourse(params).then(res => {
+          this.$router.push(`/course/${res.courseId}`);
+        });
+      } else if (val === "top1ratingcourse") {
+        const params = {
+          categoryName: this.value
+        };
+        topRatingCourse(params).then(res => {
+          this.$router.push(`/course/${res.courseId}`);
+        });
+      } else if (val === "freecourse") {
+        this.radioGroupPrice = 1;
+        this.getCourses();
+      } else if (val === "courseforbeginner") {
+        this.radioGroupLevel = 0;
+        this.getCourses();
+      } else if (val === "notunderstand") {
+        this.addSnackbar({
+          isShow: true,
+          text: "Sorry! I dont have understand your request.",
+          priority: "error",
+          timeout: 3000
+        });
+      }
     }
   },
 
   methods: {
+    ...mapActions("snackbar", ["addSnackbar"]),
     getCategoryInfo() {
       getCategory(this.$route.params.id).then(res => {
         this.category = res.data;

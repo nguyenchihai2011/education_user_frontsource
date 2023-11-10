@@ -15,8 +15,8 @@
           </div>
         </v-col>
         <v-col v-else cols="12">
-          <v-row no-gutters v-for="course in courses" :key="course.id">
-            <v-col cols="12">
+          <v-row no-gutters>
+            <v-col cols="6" v-for="course in courses" :key="course.id">
               <course-details
                 :courseId="course.id"
                 :courseImage="course.imageUrl"
@@ -25,6 +25,10 @@
                 :coursePrice="course.price"
                 :lectureName="lectureFullName(course.lecture)"
                 :showPrice="false"
+                :courseRatingAvg="course.ratingAvg"
+                :totalRatings="course.totalRatings"
+                @deleteSuccess="deleteSuccess()"
+                @changeSuccess="changeSuccess()"
               ></course-details>
             </v-col>
           </v-row>
@@ -35,13 +39,15 @@
       v-if="isCourseDialog"
       v-model="isCourseDialog"
       @closeDialog="closeCourseDialog()"
+      @changeSuccess="changeSuccess()"
     ></course-dialog>
   </v-row>
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 import CourseDetails from "@/components/course/CourseDetails.vue";
-import { getCourse } from "@/api/course";
+import { getCourseYourselfLecture } from "@/api/lecture";
 import CoreButton from "@/components/core/CoreButton.vue";
 import CourseDialog from "@/components/course/CourseDialog.vue";
 export default {
@@ -53,10 +59,31 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters("auth", ["lectureId"]),
+    ...mapGetters("alanAI", ["command", "value"])
+  },
+
+  watch: {
+    command(val) {
+      if (val === "navigateDashboard") {
+        this.$router.push("/");
+      } else if (val === "notunderstand") {
+        this.addSnackbar({
+          isShow: true,
+          text: "Sorry! I dont have understand your request.",
+          priority: "error",
+          timeout: 3000
+        });
+      }
+    }
+  },
+
   methods: {
+    ...mapActions("snackbar", ["addSnackbar"]),
     fetchCourseYourself() {
-      getCourse().then(res => {
-        this.courses = res.data;
+      getCourseYourselfLecture({ lectureId: this.lectureId }).then(res => {
+        this.courses = res.data.result;
       });
     },
 
@@ -69,6 +96,15 @@ export default {
 
     lectureFullName(lecture) {
       return `${lecture?.firstName} ${lecture?.lastName}`;
+    },
+
+    deleteSuccess() {
+      this.fetchCourseYourself();
+    },
+
+    changeSuccess() {
+      this.closeCourseDialog();
+      this.fetchCourseYourself();
     }
   },
 

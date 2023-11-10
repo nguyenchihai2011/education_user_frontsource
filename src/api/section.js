@@ -12,4 +12,18 @@ const addSection = payload => {
   return apiClient.post("/section", payload);
 };
 
-export { getSections, getSectionById, addSection };
+const updateSection = (id, payload) => {
+  return apiClient.put(`/section/${id}`, payload);
+};
+
+const deleteSection = id => {
+  return apiClient.delete(`/section/${id}`);
+};
+
+export {
+  getSections,
+  getSectionById,
+  addSection,
+  updateSection,
+  deleteSection
+};

@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="3">
+      <v-col cols="4">
         <router-link :to="`/course/${courseId}`" class="d-block">
           <v-img width="200px" cover :src="courseImage"></v-img>
           <!-- <v-img class="mr-2 d-block" contain :src="courseImage" /> -->
@@ -29,7 +29,28 @@
           letures<v-icon>mdi-circle-small</v-icon>All Levels
         </div> -->
       </v-col>
-      <v-col cols="3" v-if="showPrice">
+      <v-col cols="2" v-if="isLecture">
+        <v-menu offset-y>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn text v-bind="attrs" v-on="on">
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item @click="openEditCourse()">
+              <v-list-item-title>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="deleteCourse()">
+              <v-list-item-title>
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-col>
+      <v-col cols="2" v-if="showPrice">
         <div class="py-0 px-4 font-weight-bold">{{ coursePrice }} USD</div>
         <!-- <core-button
           class="mt-2 py-5 deep-purple lighten-2 white--text text-none"
@@ -39,20 +60,57 @@
         </core-button> -->
       </v-col>
     </v-row>
+    <course-dialog
+      v-if="isCourseDialog"
+      v-model="isCourseDialog"
+      :idInit="courseId"
+      action="edit"
+      @closeDialog="closeCourseDialog()"
+      @changeSuccess="changeSuccess()"
+    ></course-dialog>
   </v-container>
 </template>
 
 <script>
-// import CoreButton from "@/components/core/CoreButton.vue";
+import CourseDialog from "@/components/course/CourseDialog.vue";
+import { deleteCourse } from "@/api/course";
+import { mapGetters } from "vuex";
 export default {
-  // components: {
-  //   CoreButton
-  // },
+  components: {
+    CourseDialog
+  },
+
+  data() {
+    return {
+      isCourseDialog: false
+    };
+  },
+
+  computed: {
+    ...mapGetters("auth", ["role"]),
+    isLecture() {
+      return this.role === "lecture";
+    }
+  },
 
   methods: {
     navigateToCourse() {
-      console.log("dawhdjh");
       this.$router.push("/course");
+    },
+    closeCourseDialog() {
+      this.isCourseDialog = false;
+    },
+    openEditCourse() {
+      this.isCourseDialog = true;
+    },
+    deleteCourse() {
+      deleteCourse([this.courseId]).then(res => {
+        this.$emit("deleteSuccess");
+      });
+    },
+    changeSuccess() {
+      this.closeCourseDialog();
+      this.$emit("changeSuccess");
     }
   },
   props: {

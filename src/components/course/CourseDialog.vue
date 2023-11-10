@@ -238,7 +238,7 @@ import { mapGetters } from "vuex";
 import CoreDialog from "@/components/core/CoreDialog.vue";
 import CoreButton from "@/components/core/CoreButton.vue";
 import { getListCategory } from "@/api/category";
-import { addCourse } from "@/api/course";
+import { addCourse, getCourseById, updateCourse } from "@/api/course";
 
 const cloudName = "drampapfw";
 const uploadPreset = "education";
@@ -314,8 +314,30 @@ export default {
         updateAt: new Date().toISOString(),
         lectureId: this.lectureId
       };
-      addCourse(payload).then(res => {
-        console.log(res.data);
+      addCourse(payload).then(() => {
+        this.$emit("changeSuccess");
+      });
+    },
+
+    updateCourse() {
+      const payload = {
+        id: this.idInit,
+        name: this.course.name,
+        title: this.course.title,
+        imageUrl: this.course.imageUrl,
+        description: this.course.description,
+        level: this.course.level,
+        language: this.course.language,
+        categoryId: this.course.categoryId,
+        price: Number(this.course.price),
+        createBy: String(this.lectureId),
+        createAt: new Date().toISOString(),
+        updateBy: String(this.lectureId),
+        updateAt: new Date().toISOString(),
+        lectureId: this.lectureId
+      };
+      updateCourse(this.idInit, payload).then(() => {
+        this.$emit("changeSuccess");
       });
     },
 
@@ -336,21 +358,19 @@ export default {
           }
         );
         this.course.imageUrl = response.data.secure_url;
-        this.createCourse();
+        if (this.isCreate) this.createCourse();
+        if (this.isEdit) this.updateCourse();
       } catch (error) {
         console.error("Error uploading file:", error);
       }
-    },
-
-    fetchData() {
-      //   getCategory(this.idInit).then(res => {
-      //     this.categoryName = res.data.name;
-      //   });
     }
   },
 
   created() {
-    // if (!this.isCreate) this.fetchData();
+    if (!this.isCreate)
+      getCourseById(this.idInit).then(res => {
+        this.course = res.data;
+      });
     this.fetchCategories();
   },
 

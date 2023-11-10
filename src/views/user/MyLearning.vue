@@ -49,11 +49,28 @@ export default {
   },
 
   computed: {
-    ...mapGetters("auth", ["studentId"])
+    ...mapGetters("auth", ["studentId"]),
+    ...mapGetters("alanAI", ["command", "value"])
+  },
+
+  watch: {
+    command(val) {
+      if (val === "navigateDashboard") {
+        this.$router.push("/");
+      } else if (val === "notunderstand") {
+        this.addSnackbar({
+          isShow: true,
+          text: "Sorry! I dont have understand your request.",
+          priority: "error",
+          timeout: 3000
+        });
+      }
+    }
   },
 
   methods: {
     ...mapActions("yourself", ["setCoursesOfStudent"]),
+    ...mapActions("snackbar", ["addSnackbar"]),
     fetchCourseYourself() {
       getCourseYourselfStudent(this.studentId).then(res => {
         this.student = res.data;
