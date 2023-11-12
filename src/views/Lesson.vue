@@ -129,7 +129,12 @@
           <div class="d-flex justify-space-between align-center py-2">
             <div class="ml-4 text-h5 font-ưeight-bold">Course Content</div>
             <div class="d-flex justify-end align-center">
-              <!-- <progress-chart :data="dataProgress" :width="80" :height="80" /> -->
+              <progress-chart
+                v-if="isStudent"
+                :data="dataProgress"
+                :width="80"
+                :height="80"
+              />
               <v-btn @click="isNavigation = false" text>
                 <v-icon>mdi-close</v-icon>
               </v-btn>
@@ -148,13 +153,9 @@
                 v-for="lesson in item.lessons"
                 :key="lesson.id"
               >
-                <v-card flat class="d-flex flex-column justify-start">
-                  <!-- <v-checkbox
-                    v-model="lesson.studentLessons[0].isLock"
-                    class="ma-0 mr-2"
-                    @click="updateProgress(lesson.id)"
-                  ></v-checkbox> -->
+                <v-card flat>
                   <v-card-actions
+                    class="d-flex align-center"
                     @click="
                       () => {
                         $router.push(
@@ -164,8 +165,17 @@
                       }
                     "
                   >
+                    <v-checkbox
+                      v-if="isStudent"
+                      v-model="lesson.studentLessons[0].isLock"
+                      class="ma-0 mr-2 d-flex align-center"
+                      hide-details
+                      @click="updateProgress(lesson.id)"
+                    ></v-checkbox>
                     <div class="font-weight-bold">{{ lesson.name }}</div>
-                    <v-icon class="mr-2" size="20">mdi-television-play</v-icon>
+                    <v-icon class="ml-2 mr-2" size="20"
+                      >mdi-television-play</v-icon
+                    >
                   </v-card-actions>
                   <div class="d-flex">
                     <div v-for="(quiz, index) in lesson.quizzes" :key="index">
@@ -198,7 +208,7 @@ import {
   getProgress
 } from "@/api/studentLesson";
 import { mapGetters, mapActions } from "vuex";
-// import ProgressChart from "@/components/app/ProgressChart.vue";
+import ProgressChart from "@/components/app/ProgressChart.vue";
 import { getCommentsCourse } from "@/api/comment";
 
 const connection = new signalR.HubConnectionBuilder()
@@ -209,8 +219,8 @@ const connection = new signalR.HubConnectionBuilder()
   .build();
 
 export default {
-  // components: { CoreFooter, ProgressChart },
-  components: { CoreFooter },
+  components: { CoreFooter, ProgressChart },
+  // components: { CoreFooter },
 
   data() {
     return {
@@ -230,8 +240,15 @@ export default {
   },
 
   computed: {
-    ...mapGetters("auth", ["studentId", "userId", "avatarUrl"]),
-    ...mapGetters("alanAI", ["command", "value"])
+    ...mapGetters("auth", ["studentId", "userId", "role", "avatarUrl"]),
+    ...mapGetters("alanAI", ["command", "value"]),
+
+    isStudent() {
+      return this.role === "Student";
+    },
+    isLecture() {
+      return this.role === "Lecture";
+    }
   },
 
   watch: {
@@ -374,9 +391,9 @@ export default {
       courseId: this.$route.params.courseId,
       studentId: this.studentId
     };
-    // getProgress(progressParams).then(res => {
-    //   this.dataProgress = res.data;
-    // });
+    getProgress(progressParams).then(res => {
+      this.dataProgress = res.data;
+    });
     this.getCommentsCourse();
   },
 

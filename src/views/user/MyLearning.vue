@@ -13,7 +13,7 @@
         <v-col v-else cols="12">
           <v-row no-gutters v-for="order in student.orders" :key="order.id">
             <v-col
-              cols="12"
+              cols="9"
               v-for="orderDetail in order.orderDetails"
               :key="orderDetail.id"
             >

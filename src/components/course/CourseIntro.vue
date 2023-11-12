@@ -14,8 +14,8 @@
       style="height: 130px;"
     ></v-img>
 
-    <v-card-title>{{ courseName }}</v-card-title>
-    <v-card-subtitle class="pb-2">{{ courseTitle }}</v-card-subtitle>
+    <v-card-title class="course-name">{{ courseName }}</v-card-title>
+    <v-card-subtitle class="course-title">{{ courseTitle }}</v-card-subtitle>
 
     <v-card-text class="pb-2">
       <div class="d-flex">
@@ -81,3 +81,24 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.course-name {
+  white-space: initial;
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  padding-bottom: 0;
+}
+.course-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  padding-top: 20px;
+  padding-bottom: 0;
+}
+</style>

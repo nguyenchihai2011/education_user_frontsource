@@ -300,7 +300,7 @@
           </div>
           <div class="mt-15">
             <v-card-title class="text-h5 font-weight-bold">
-              <div class="d-flex">
+              <div class="d-flex" v-if="ratingCourse.averageRating > 0">
                 <v-icon color="amber">mdi-star</v-icon>
                 <div class="text-h6 font-weight-bold">
                   {{ ratingCourse.averageRating }} course rating
@@ -597,14 +597,14 @@ export default {
     },
 
     addToCart(item) {
-      if (!this.listCourseSelectToBuy.includes(item.id)) {
+      if (!this.listCourseSelectToBuy?.includes(item.id)) {
         createCartDetails({ cartId: this.cartId, courseId: item.id }).then(
           () => {
             this.setCartQuantity(this.cartQuantity + 1);
             this.listCourseSelectToBuy = this.listCourseSelectToBuy.push(
               item.id
             );
-            this.setListCourseSelectToBuy(listCourseSelectToBuy);
+            this.setListCourseSelectToBuy(this.listCourseSelectToBuy);
           }
         );
       }

@@ -16,7 +16,7 @@
         </v-col>
         <v-col v-else cols="12">
           <v-row no-gutters>
-            <v-col cols="6" v-for="course in courses" :key="course.id">
+            <v-col cols="9" v-for="course in courses" :key="course.id">
               <course-details
                 :courseId="course.id"
                 :courseImage="course.imageUrl"

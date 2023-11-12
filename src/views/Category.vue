@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container :key="categoryKey">
     <v-row>
       <v-col cols="12">
         <div class="text-h4">{{ category.name }} Courses</div>
@@ -188,7 +188,8 @@ export default {
       page: 1,
       course: {},
       courseBeginners: [],
-      topCourses: []
+      topCourses: [],
+      categoryKey: 0
     };
   },
 
@@ -199,6 +200,26 @@ export default {
   watch: {
     "$route.params.id"() {
       this.getCategoryInfo();
+      this.getCourses();
+      const paramsBeginner = {
+        categoryId: this.$route.params.id,
+        level: "Beginner",
+        page: 1,
+        size: 12
+      };
+      getCourse(paramsBeginner).then(res => {
+        this.courseBeginners = res.data.result;
+      });
+
+      const paramsTopCourse = {
+        categoryId: this.$route.params.id,
+        rating: 4,
+        page: 1,
+        size: 12
+      };
+      getCourse(paramsTopCourse).then(res => {
+        this.topCourses = res.data.result;
+      });
     },
 
     page() {

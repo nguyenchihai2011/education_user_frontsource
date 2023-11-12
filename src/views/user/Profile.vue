@@ -169,7 +169,7 @@ export default {
             }
           );
           this.user.avatarUrl = response.data.secure_url;
-          if (!this.lectureId && !this.studentId) {
+          if (this.lectureId === "undefined" && !this.studentId) {
             this.createProfile();
           } else {
             this.changeProfile();
@@ -178,7 +178,7 @@ export default {
           console.error("Error uploading file:", error);
         }
       } else {
-        if (!this.lectureId && !this.studentId) {
+        if (this.lectureId === "undefined" && !this.studentId) {
           this.createProfile();
         } else {
           this.changeProfile();

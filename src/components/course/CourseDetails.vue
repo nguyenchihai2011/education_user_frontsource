@@ -3,13 +3,13 @@
     <v-row>
       <v-col cols="4">
         <router-link :to="`/course/${courseId}`" class="d-block">
-          <v-img width="200px" cover :src="courseImage"></v-img>
-          <!-- <v-img class="mr-2 d-block" contain :src="courseImage" /> -->
+          <!-- <v-img cover :src="courseImage"></v-img> -->
+          <v-img class="mr-2 d-block" contain :src="courseImage" />
         </router-link>
       </v-col>
       <v-col cols="6">
         <div class="font-weight-bold">{{ courseName }}</div>
-        <div class="text-subtitle-1">{{ courseTitle }}</div>
+        <div class="text-subtitle-1 course-title">{{ courseTitle }}</div>
         <div class="text-caption">{{ lectureName }}</div>
         <div class="d-flex mx-0">
           <v-rating
@@ -145,3 +145,13 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.course-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+</style>

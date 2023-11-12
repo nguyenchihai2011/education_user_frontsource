@@ -93,6 +93,8 @@
 import { mapGetters, mapActions } from "vuex";
 import { addOrder } from "@/api/order";
 import { getCartId } from "@/api/cart";
+import { deleteCartDetails } from "@/api/cartDetails";
+import _ from "lodash";
 export default {
   data() {
     return {
@@ -188,7 +190,7 @@ export default {
     if (!this.isBuyNow) {
       getCartId(this.cartId).then(res => {
         this.courses = res.data.cartDetails
-          .filter(item => this.listCourseSelectToBuy.includes(item.id))
+          .filter(item => this.listCourseSelectToBuy.includes(item.course.id))
           .map(item => {
             return {
               ...item.course,
@@ -207,9 +209,23 @@ export default {
     if (this.isPaymentPaypal) {
       let originalPrice = this.originalPrice;
       let studentId = this.studentId;
-      let orderDetailsDTO = [this.courseBuyNow].map(item => {
-        return { courseId: item.id, price: item.price };
-      });
+      let cartId = this.cartId;
+      let orderDetailsDTO = [];
+      let self = this;
+      if (this.isBuyNow) {
+        orderDetailsDTO = _.cloneDeep(
+          [this.courseBuyNow].map(item => {
+            return { courseId: item.id, price: item.price };
+          })
+        );
+      } else {
+        orderDetailsDTO = _.cloneDeep(
+          this.courses.map(item => {
+            return { courseId: item.id, price: item.price };
+          })
+        );
+      }
+
       paypal
         .Buttons({
           createOrder: function(data, actions) {
@@ -226,34 +242,29 @@ export default {
             });
           },
           onApprove: function(data, actions) {
-            // Xác nhận đơn hàng sau khi thanh toán thành công
             return actions.order.capture().then(function(details) {
-              // Thực hiện các hành động cần thiết sau khi thanh toán thành công
               const payload = {
                 payment: "Paypal",
                 totalPrice: originalPrice,
-                createAt: "2023-10-25T17:40:12.134Z",
+                createAt: new Date().toISOString(),
                 studentId: studentId,
                 orderDetailsDTO: orderDetailsDTO
               };
-              addOrder(payload).then(res => {
-                console.log("success");
+              addOrder(payload).then(() => {
                 const cartDetails = [];
                 orderDetailsDTO.forEach(element => {
                   cartDetails.push({
-                    cartId: this.cartId,
+                    cartId: cartId,
                     courseId: element.courseId
                   });
                 });
                 deleteCartDetails(cartDetails).then(() => {
-                  this.setCartQuantity(
-                    this.cartQuantity - orderDetailsDTO.length
+                  self.setCartQuantity(
+                    self.cartQuantity - orderDetailsDTO.length
                   );
                 });
+                self.$router.push("/");
               });
-              console.log(
-                "Transaction completed by " + details.payer.name.given_name
-              );
             });
           }
         })

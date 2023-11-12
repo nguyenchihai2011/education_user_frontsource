@@ -168,7 +168,7 @@ export default {
     totalCost() {
       return this.courses.reduce(
         (accumulator, currentValue) =>
-          accumulator + currentValue.saveForLater ? 0 : currentValue.price,
+          accumulator + (currentValue.saveForLater ? 0 : currentValue.price),
         0
       );
     }

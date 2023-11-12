@@ -5,7 +5,7 @@ const getCartId = id => {
 };
 
 const createCart = payload => {
-  return apiClient.get(`/cart/`, payload);
+  return apiClient.post(`/cart/`, payload);
 };
 
 export { getCartId, createCart };

@@ -84,7 +84,7 @@
           class="mx-auto"
           width="100%"
           tile
-          style="position: absolute; z-index: 999;"
+          style="position: absolute; z-index: 999; max-height: 400px; overflow: auto;"
           :style="{ bottom: -cardBottom + 'px' }"
           v-show="course.result && course.result.length > 0"
           ref="cardRef"
@@ -101,7 +101,7 @@
                   <v-col cols="2" class="d-flex align-center">
                     <v-img :src="item.imageUrl" max-width="100px"></v-img
                   ></v-col>
-                  <v-col cols="10" class="d-flex align-center">
+                  <v-col cols="9" class="d-flex align-center ml-2">
                     <v-list-item-title v-text="item.name"></v-list-item-title
                   ></v-col>
                 </v-row>
@@ -307,7 +307,7 @@ export default {
         })
         .finally(() => {
           this.cardBottom =
-            document.getElementById("header-card").clientHeight * 1.5;
+            document.getElementById("header-card").clientHeight * 1;
         });
     },
 

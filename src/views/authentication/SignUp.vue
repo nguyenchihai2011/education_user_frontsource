@@ -96,7 +96,9 @@ export default {
 
       if (this.isSignUpStudent) {
         signUpStudent(payload).then(res => {
-          createCart({ studentId: res.data.id }).then(res => console.log(res));
+          createCart({ studentId: res.data.userId }).then(res =>
+            console.log(res)
+          );
         });
       } else {
         signUpLecture(payload).then(() => {});

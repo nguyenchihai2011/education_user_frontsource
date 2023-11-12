@@ -223,7 +223,7 @@ export default {
     const paramsRecommend = {
       rating: 4,
       page: 1,
-      size: 10
+      size: 12
     };
     getCourse(paramsRecommend).then(res => {
       this.recommend = res.data.result;
